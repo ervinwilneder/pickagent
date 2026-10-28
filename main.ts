@@ -2,7 +2,10 @@
 import http from "node:http";
 import { crearServer } from "./server.ts";
 
-const { server } = crearServer();
+import { belo } from "./src/belo/index.ts";
+
+const cuenta = belo();
+const { server } = crearServer(cuenta);
 
 /** Con BELO_LOG=1 imprime método y tool de cada pedido, para diagnosticar. */
 function registrar(req: http.IncomingMessage) {
@@ -24,6 +27,21 @@ if (process.argv.includes("--stdio")) {
   const port = parseInt(process.env.PORT ?? "3001", 10);
   const httpServer = http.createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
+    // Solo la cuenta falsa: otro server falso le avisa que le transfirieron (un depósito entra al historial).
+    if (url.pathname === "/interno/deposito" && req.method === "POST" && cuenta.simulacion) {
+      let cuerpo = "";
+      req.on("data", (c) => (cuerpo += c));
+      req.on("end", async () => {
+        try {
+          const { monto, de } = JSON.parse(cuerpo) as { monto: string; de: string };
+          await cuenta.simulacion!.deposito(String(monto), String(de));
+          res.writeHead(204).end();
+        } catch {
+          res.writeHead(400).end();
+        }
+      });
+      return;
+    }
     if (url.pathname !== "/mcp") {
       res.writeHead(404).end();
       return;

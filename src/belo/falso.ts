@@ -10,7 +10,14 @@ const ahora = () => new Date().toISOString();
 const vence = () => new Date(Date.now() + 60_000).toISOString();
 const dec = (n: number, d = 2) => n.toFixed(d);
 
-export function beloFalso(): BeloPort {
+export interface ParFalso {
+  /** Si una transferencia va a este belotag, se avisa al par para que la reciba como depósito. */
+  belotag: string;
+  url: string;
+  nombreDeEstaCuenta: string;
+}
+
+export function beloFalso(par?: ParFalso): BeloPort {
   const saldos: Saldo[] = [
     { currencyCode: "ARGt", name: "Argentine Peso Token", type: "fiat_token", decimals: 2, available: "1850000.00", earned: { total: "12500.00", today: "890.00", month: "9800.00" }, yield: { rate: "19.00%" } },
     { currencyCode: "USDT", name: "Tether USD", type: "stablecoin", decimals: 6, available: "2400.000000", earned: { total: "61.204000", today: "0.650000", month: "18.100000" }, yield: { rate: "3.36%", extraYield: "6.63%", totalYield: "10.00%" } },
@@ -61,6 +68,11 @@ export function beloFalso(): BeloPort {
         if (s) s.available = (Number(s.available) - Number(d.amount)).toFixed(s.decimals);
       }
       transacciones.unshift(t);
+      const destino = t.receipt?.counterparty?.account;
+      if (par && t.type === "transfer" && destino === par.belotag) {
+        const monto = t.receipt?.debits?.[0]?.amount ?? t.amount ?? "0";
+        fetch(`${par.url}/interno/deposito`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ monto, de: par.nombreDeEstaCuenta }) }).catch((e) => console.error("par de belo:", e instanceof Error ? e.message : e));
+      }
     }, 4_000);
     return { id, status: "pending", approvalUrl: `https://belo.app/aprobar/${id}` };
   }
@@ -112,7 +124,7 @@ export function beloFalso(): BeloPort {
       const fee = p.addressType === "TRON" ? 1.5 : p.addressType === "POLYGON" ? 1 : 0;
       exigir(p.currency, monto + fee);
       const id = randomUUID();
-      pendientes.set(id, { ...tx("transfer", dec(monto, 6), p.currency, "pending", { debits: [{ currency: p.currency, amount: dec(monto + fee, 6) }] }, 0), id });
+      pendientes.set(id, { ...tx("transfer", dec(monto, 6), p.currency, "pending", { counterparty: { name: p.addressType === "BELOTAG" ? `$${p.address}` : null, bank: p.addressType === "BELOTAG" ? "BELO" : null, belotag: p.addressType === "BELOTAG" ? p.address : null, account: p.address, accountType: p.addressType }, debits: [{ currency: p.currency === "ARGt" ? "ARS" : p.currency, amount: dec(monto + fee, 6) }] }, 0), id });
       return { id, status: "pending", address: p.address, addressType: p.addressType, currency: p.currency, amount: dec(monto, 18), fee: dec(fee, 2), exchangeRate: null, expiresAt: vence(), debits: [{ currency: p.currency, amount: dec(monto + fee) }] } as never;
     },
     async confirmarTransferencia(id) { return confirmar(id); },

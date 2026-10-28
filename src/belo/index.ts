@@ -16,5 +16,7 @@ export function belo(): BeloPort {
   if (apiKey && baseUrl) return beloRest({ apiKey, baseUrl });
   if (apiKey || baseUrl) throw new Error("Configurá BELO_API_KEY y BELO_BASE_URL juntas, o ninguna para la cuenta falsa");
   console.error("belo: sin API key, usando la cuenta falsa en memoria");
-  return beloFalso();
+  const parBelotag = process.env.BELO_FALSO_PAR_BELOTAG;
+  const parUrl = process.env.BELO_FALSO_PAR_URL;
+  return beloFalso(parBelotag && parUrl ? { belotag: parBelotag, url: parUrl, nombreDeEstaCuenta: process.env.BELO_FALSO_NOMBRE ?? "Cliente de pickagent" } : undefined);
 }

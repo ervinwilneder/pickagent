@@ -91,7 +91,7 @@ export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemp
       outputSchema: z.object({ resumen: z.string(), reserva: z.any() }),
       execute: ({ reservaId, transaccionId, monto }) => intentar(async () => {
         const r = await m.marcarPagada(reservaId, transaccionId, monto);
-        return { resumen: `Reserva ${r.codigo} pagada. ${r.cobro.destinatario.nombre} retira en ${r.pedido.origen.localidad.nombre} ${hora(r.oferta.retiro)} y entrega en ${r.pedido.destino.localidad.nombre} ${hora(r.oferta.entrega)}. Ahorro por belo: ${pesos(r.oferta.precio - r.oferta.precioBelo)}. Código de seguimiento: ${r.codigo}.`, reserva: r };
+        return { resumen: `Reserva ${r.codigo} pagada. ${r.oferta.transportista.nombre} retira en ${r.pedido.origen.localidad.nombre} ${hora(r.oferta.retiro)} y entrega en ${r.pedido.destino.localidad.nombre} ${hora(r.oferta.entrega)}. Ahorro por belo: ${pesos(r.oferta.precio - r.oferta.precioBelo)}. Código de seguimiento: ${r.codigo}.`, reserva: r };
       }),
     }),
 
@@ -103,7 +103,7 @@ export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemp
       execute: ({ codigo }) => intentar(async () => {
         const r = await m.seguimiento(codigo);
         const hitos = r.hitos.map((h) => `${hora(h.cuando)}: ${estadoLegible[h.estado]}${h.donde ? ` en ${h.donde}` : ""}, ${h.detalle}`).join("; ");
-        return { resumen: `${r.codigo}: ${estadoLegible[r.estado]} (pago ${modoPagoLegible[r.cobro.modo]}). ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre} con ${r.cobro.destinatario.nombre}; entrega estimada ${hora(r.oferta.entrega)}. Hitos: ${hitos}.`, reserva: r };
+        return { resumen: `${r.codigo}: ${estadoLegible[r.estado]} (pago ${modoPagoLegible[r.cobro.modo]}). ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre} con ${r.oferta.transportista.nombre}; entrega estimada ${hora(r.oferta.entrega)}. Hitos: ${hitos}.`, reserva: r };
       }),
     }),
 

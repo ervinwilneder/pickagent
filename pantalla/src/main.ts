@@ -5,12 +5,16 @@
  */
 import { MastraClient } from "@mastra/client-js";
 import type { CallToolResult } from "@modelcontextprotocol/client";
-import { conectarServidor, renderizarVista, vistaDe, type Servidor } from "./host.ts";
+import { conectarServidor, renderizarVista, resolver as ubicar, type Servidores } from "./host.ts";
 import "./estilos.css";
 
 const MASTRA = import.meta.env.VITE_MASTRA_URL ?? "http://localhost:4111";
-const BELO = import.meta.env.VITE_BELO_MCP_URL ?? "http://localhost:3001/mcp";
-const AGENTE = "belo";
+/** Los servers MCP que el agente usa, por nombre: sus vistas se renderizan en el chat. */
+const SERVERS: Record<string, string> = {
+  logistica: import.meta.env.VITE_LOGISTICA_MCP_URL ?? "http://localhost:3002/mcp",
+  belo: import.meta.env.VITE_BELO_MCP_URL ?? "http://localhost:3001/mcp",
+};
+const AGENTE = import.meta.env.VITE_AGENTE ?? "pickagent";
 const HILO = { threadId: import.meta.env.VITE_HILO ?? "principal", resourceId: import.meta.env.VITE_PERSONA ?? "ervin" };
 
 const mensajesEl = document.getElementById("mensajes")!;
@@ -36,7 +40,7 @@ const llamadas = new Map<string, { nombre: string; args: Record<string, unknown>
 function burbuja(rol: "persona" | "agente" | "evento", cuando?: string | number) {
   const b = document.createElement("article");
   b.className = `mensaje ${rol}`;
-  b.innerHTML = `<header><span class="rol">${rol === "persona" ? "$ vos" : rol === "agente" ? "belo" : "[evento]"}</span><span class="cuando">${esc(hora(cuando))}</span></header><div class="contenido"></div>`;
+  b.innerHTML = `<header><span class="rol">${rol === "persona" ? "$ vos" : rol === "agente" ? "pickagent" : "[evento]"}</span><span class="cuando">${esc(hora(cuando))}</span></header><div class="contenido"></div>`;
   mensajesEl.append(b);
   b.scrollIntoView({ block: "end" });
   return b;
@@ -82,8 +86,8 @@ function cerrarTurno() {
   textoActual = null;
 }
 
-let servidor: Servidor | null = null;
-const toolDelServidor = (nombre: string) => nombre.replace(/^belo_/, "");
+const servidores: Servidores = new Map();
+const toolDelServidor = (nombre: string) => ubicar(servidores, nombre)?.tool ?? nombre;
 
 function abrirLlamada(id: string, nombre: string, args: Record<string, unknown>) {
   if (!burbujaActual) abrirTurno();
@@ -99,12 +103,12 @@ function abrirLlamada(id: string, nombre: string, args: Record<string, unknown>)
     rechazar = rej;
   });
   llamadas.set(id, { nombre, args, caja, resolver, rechazar });
-  const uri = servidor ? vistaDe(servidor, toolDelServidor(nombre)) : undefined;
-  if (servidor && uri) {
+  const r = ubicar(servidores, nombre);
+  if (r?.uri) {
     const marco = document.createElement("div");
     marco.className = "marco-vista";
     caja.after(marco);
-    void renderizarVista(servidor, uri, marco, args, resultado, {
+    void renderizarVista(r.servidor, r.uri, marco, args, resultado, {
       alMensaje: (m) => {
         const t = m.content.map((c) => ("text" in c ? c.text : "")).join("");
         if (t) void enviar(t, true);
@@ -161,15 +165,15 @@ function pintarHistorial(mensajes: { role: string; content?: unknown; createdAt?
           caja.className = "llamada";
           caja.innerHTML = `<span class="marca ok">[OK]</span> usó <code>${esc(toolDelServidor(p.toolName))}</code>`;
           cont.append(caja);
-          const uri = servidor ? vistaDe(servidor, toolDelServidor(p.toolName)) : undefined;
+          const rs = ubicar(servidores, p.toolName);
           const salida = p.output ?? p.result;
-          if (servidor && uri && salida !== undefined) {
+          if (rs?.uri && salida !== undefined) {
             const marco = document.createElement("div");
             marco.className = "marco-vista";
             caja.after(marco);
             const r = salida as { content?: unknown };
             const res: CallToolResult = Array.isArray(r?.content) ? (r as CallToolResult) : { content: [{ type: "text", text: JSON.stringify(salida) }], structuredContent: salida as Record<string, unknown> };
-            void renderizarVista(servidor, uri, marco, p.input ?? p.args ?? {}, Promise.resolve(res), { alEstado: (paso) => (caja.dataset.estado = paso) }).catch((e) => (marco.textContent = `No pude mostrar la vista: ${e instanceof Error ? e.message : e}`));
+            void renderizarVista(rs.servidor, rs.uri, marco, p.input ?? p.args ?? {}, Promise.resolve(res), { alEstado: (paso) => (caja.dataset.estado = paso) }).catch((e) => (marco.textContent = `No pude mostrar la vista: ${e instanceof Error ? e.message : e}`));
           }
         } else if (p.type === "error") {
           const el = document.createElement("p");
@@ -261,12 +265,17 @@ formEl.addEventListener("submit", (e) => {
 });
 
 (async () => {
-  try {
-    servidor = await conectarServidor(new URL(BELO));
-    document.getElementById("servidor")!.textContent = `${servidor.tools.size} tools · ${servidor.resources.size} vistas`;
-  } catch (e) {
-    document.getElementById("servidor")!.textContent = "sin vistas";
-    console.error("server de belo:", e);
+  const partes: string[] = [];
+  for (const [nombre, url] of Object.entries(SERVERS)) {
+    try {
+      const s = await conectarServidor(new URL(url));
+      servidores.set(nombre, s);
+      partes.push(`${nombre} ${s.tools.size} tools · ${s.resources.size} vistas`);
+    } catch (e) {
+      partes.push(`${nombre} sin conexión`);
+      console.error(`server ${nombre}:`, e);
+    }
   }
+  document.getElementById("servidor")!.textContent = partes.join(" / ");
   await suscribir();
 })().catch((e) => estado(`no pude conectar: ${e instanceof Error ? e.message : e}`, true));

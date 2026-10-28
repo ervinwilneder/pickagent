@@ -8,15 +8,17 @@ import { MCPClient, MCPEventsSignalProvider } from "@mastra/mcp";
 import { Memory } from "@mastra/memory";
 import { instrucciones } from "./instrucciones.ts";
 
-/** El server MCP de belo. Sin default de producción: sale de la configuración. */
-const servidor = process.env.BELO_MCP_URL;
-if (!servidor) throw new Error("Configurá BELO_MCP_URL (por ejemplo http://localhost:3001/mcp)");
+/** Los dos servers MCP de pickagent. Sin defaults de producción: salen de la configuración. */
+const servidorBelo = process.env.BELO_MCP_URL;
+const servidorLogistica = process.env.LOGISTICA_MCP_URL;
+if (!servidorBelo) throw new Error("Configurá BELO_MCP_URL (por ejemplo http://localhost:3001/mcp)");
+if (!servidorLogistica) throw new Error("Configurá LOGISTICA_MCP_URL (por ejemplo http://localhost:3002/mcp)");
 
 export const storage = new LibSQLStore({ id: "belo-agente", url: process.env.BELO_AGENTE_DB ?? "file:./belo-agente.db" });
 
 export const belo = new MCPClient({
-  id: "belo",
-  servers: { belo: { url: new URL(servidor) } },
+  id: "pickagent",
+  servers: { logistica: { url: new URL(servidorLogistica) }, belo: { url: new URL(servidorBelo) } },
 });
 
 /** Los eventos del server llegan al hilo del agente como notificaciones de prioridad alta: arrancan un turno si el hilo está inactivo. */
@@ -31,9 +33,9 @@ export const eventos = new MCPEventsSignalProvider({
 });
 
 export const agente = new Agent({
-  id: "belo",
-  name: "belo",
-  description: "Acompaña a la persona con su cuenta de belo y reacciona a los movimientos de la cuenta.",
+  id: "pickagent",
+  name: "pickagent",
+  description: "Resuelve envíos de mercadería con los proveedores de logística agregados y cobra por belo; reacciona a los movimientos de la cuenta.",
   instructions: instrucciones,
   model: process.env.BELO_AGENTE_MODELO ?? "anthropic/claude-sonnet-5-5",
   tools: await belo.listTools(),

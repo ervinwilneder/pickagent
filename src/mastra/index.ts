@@ -3,7 +3,7 @@ import { PinoLogger } from "@mastra/loggers";
 import { agente, belo, eventos, hiloPrincipal, storage } from "./belo.ts";
 
 export const mastra = new Mastra({
-  agents: { belo: agente },
+  agents: { pickagent: agente },
   // Los proxies del server de belo: así Studio resuelve los recursos ui:// de sus vistas.
   mcpServers: belo.toMCPServerProxies(),
   storage,

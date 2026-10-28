@@ -49,6 +49,20 @@ export function vistaDe(servidor: Servidor, tool: string): string | undefined {
   return t ? getToolUiResourceUri(t) : undefined;
 }
 
+/** Los servers por nombre; una tool del agente "belo_cuenta" es la tool "cuenta" del server "belo". */
+export type Servidores = Map<string, Servidor>;
+
+export function resolver(servidores: Servidores, toolDelAgente: string): { servidor: Servidor; tool: string; uri?: string } | undefined {
+  for (const [nombre, servidor] of servidores) {
+    const prefijo = `${nombre}_`;
+    if (toolDelAgente.startsWith(prefijo)) {
+      const tool = toolDelAgente.slice(prefijo.length);
+      return { servidor, tool, uri: vistaDe(servidor, tool) };
+    }
+  }
+  return undefined;
+}
+
 async function leerVista(servidor: Servidor, uri: string) {
   let p = servidor.html.get(uri);
   if (!p) {

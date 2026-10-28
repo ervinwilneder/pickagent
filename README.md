@@ -52,7 +52,7 @@ de la conversación.
 ```
 pantalla (Vite)  ──suscripta al hilo──▶  agentes (Mastra)  ──MCPClient──▶  motor de logística (MCP)
    │  vistas en sandbox                    pickagent                          │  transportistas por catálogo y por API
-   │  switch de agente y de belo           mi asistente (con / sin belo)      │  pedidos, ofertas, reservas, seguimiento
+   │  modo único con belo                  atención al cliente con belo      │  pedidos, ofertas, reservas, seguimiento
    └──────────────────────────────────────▶  señales por eventos  ◀──────────▶  belo (MCP + API)
 hosts externos (Claude, ChatGPT) usan los mismos MCP                             │  saldos, transferencias, pix, cobros
                                                                                   │  evento movimiento.nuevo, belo air
@@ -101,7 +101,6 @@ cd interfaces/web/agente/pantalla && npm ci
 cat > .env <<EOT
 VITE_MASTRA_URL=http://localhost:4111
 VITE_BELO_MCP_URL=http://localhost:3001/mcp
-VITE_PICKAGENT_BELO_MCP_URL=http://localhost:3004/mcp
 VITE_LOGISTICA_MCP_URL=http://localhost:3002/mcp
 EOT
 npm run dev
@@ -118,7 +117,7 @@ llega a tu máquina.
 
 ## Guion para probar
 
-Abrí la pantalla con el switch en **mi asistente** y **belo conectado** prendido.
+Abrí `/app.html`: PickAgent tiene un único modo con Belo conectado.
 
 1. "Necesito mandar 20 cajas de repuestos, unos 120 kilos, desde Villa Crespo a
    Rosario antes del viernes a las 10. Es frágil." Se abre el formulario;
@@ -126,10 +125,10 @@ Abrí la pantalla con el switch en **mi asistente** y **belo conectado** prendid
 2. Elegí una oferta con **Elegir y pagar con belo**; decí "por adelantado".
 3. Aprobá la transferencia en la vista de belo.
 4. Sin escribir nada: el pago sale, la reserva se confirma, llega el seguimiento.
-5. Cambiá a **pickagent**: se ve el depósito entrando y el cruce con la reserva,
-   con las llamadas a herramientas a la vista.
-6. Otro pedido con "pago contra entrega con belo air".
-7. Apagá **belo conectado** y repetí: mismo pedido, a precio de lista y pago manual.
+5. Probá otro pedido con "pago contra entrega con belo air".
+
+El agente interno de la empresa cruza el depósito con la reserva sin cambiar
+de vista ni de modo.
 
 ## Cómo se trabaja
 

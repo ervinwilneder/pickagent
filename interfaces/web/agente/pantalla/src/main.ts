@@ -7,37 +7,58 @@ import { MastraClient } from "@mastra/client-js";
 import type { CallToolResult } from "@modelcontextprotocol/client";
 import { conectarServidor, renderizarVista, resolver as ubicar, type Servidores } from "./host.ts";
 import "./estilos.css";
+import { icono, montarIconos } from "../../../../../shared/ui/phosphor.ts";
+
+montarIconos();
 
 const MASTRA = import.meta.env.VITE_MASTRA_URL ?? "http://localhost:4111";
-/** ?agente=asistente abre el asistente personal (con belo); ?agente=asistente-sin-belo, el mismo sin belo. */
-const AGENTE = new URLSearchParams(location.search).get("agente") ?? import.meta.env.VITE_AGENTE ?? "pickagent";
-/**
- * Los servers MCP que el agente usa, por nombre: sus vistas se renderizan en
- * el chat. La cuenta de belo depende de quién habla: pickagent usa la de la
- * empresa; el asistente, la del cliente.
- */
+/** Los enlaces anteriores abren el mismo modo único, sin conservar el selector. */
+const url = new URL(location.href);
+if (url.searchParams.has("agente")) {
+  url.searchParams.delete("agente");
+  history.replaceState(history.state, "", url);
+}
+/** La pantalla de PickAgent siempre usa logística y la cuenta Belo del cliente. */
 const SERVERS: Record<string, string> = {
   logistica: import.meta.env.VITE_LOGISTICA_MCP_URL ?? "http://localhost:3002/mcp",
-  belo: AGENTE === "pickagent" ? (import.meta.env.VITE_PICKAGENT_BELO_MCP_URL ?? "http://localhost:3004/mcp") : (import.meta.env.VITE_BELO_MCP_URL ?? "http://localhost:3001/mcp"),
+  belo: import.meta.env.VITE_BELO_MCP_URL ?? "http://localhost:3001/mcp",
 };
-const HILO = { threadId: AGENTE === "pickagent" ? "principal" : AGENTE, resourceId: import.meta.env.VITE_PERSONA ?? "ervin" };
-const NOMBRE: Record<string, string> = { pickagent: "pickagent", asistente: "mi asistente", "asistente-sin-belo": "mi asistente" };
-const ES_ASISTENTE = AGENTE !== "pickagent";
-const CON_BELO = AGENTE !== "asistente-sin-belo";
+const HILO = { threadId: "asistente", resourceId: import.meta.env.VITE_PERSONA ?? "ervin" };
 
 const mensajesEl = document.getElementById("mensajes")!;
-const estadoEl = document.getElementById("estado")!;
+const errorEl = document.getElementById("error-mensaje")!;
 const formEl = document.getElementById("composer") as HTMLFormElement;
-const inputEl = document.getElementById("texto") as HTMLInputElement;
+const inputEl = document.getElementById("texto") as HTMLTextAreaElement;
 const enviarBtn = document.getElementById("enviar") as HTMLButtonElement;
+const sinModeloLocal = import.meta.env.DEV && import.meta.env.VITE_LOCAL_SIN_MODELO === "1";
+enviarBtn.disabled = sinModeloLocal;
+
+function pintarBienvenida() {
+  if (mensajesEl.childElementCount) return;
+  const template = document.getElementById("bienvenida-template") as HTMLTemplateElement;
+  mensajesEl.append(template.content.cloneNode(true));
+  montarIconos(mensajesEl);
+}
+pintarBienvenida();
+mensajesEl.addEventListener("click", (event) => {
+  const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>("button[data-ejemplo]") : null;
+  if (!button) return;
+  inputEl.value = button.dataset.ejemplo ?? "";
+  inputEl.focus();
+});
 
 const esc = (s: unknown) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 /** El agente escribe con negritas de markdown; se respetan, el resto va como texto. */
 const conFormato = (t: string) => esc(t).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
 const hora = (d: Date | string | number = Date.now()) => new Date(d).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
 const estado = (t: string, alerta = false) => {
-  estadoEl.textContent = t;
-  estadoEl.className = alerta ? "estado alerta" : "estado";
+  errorEl.hidden = !alerta;
+  errorEl.textContent = alerta
+    ? t.startsWith("no pude enviar")
+      ? "No se pudo enviar el mensaje. Intentá de nuevo."
+      : "No se pudo conectar con el agente. Intentá de nuevo."
+    : "";
+  if (alerta) console.warn(t);
 };
 
 /* Burbujas. Cada turno del asistente es una burbuja que recibe texto y vistas. */
@@ -46,9 +67,10 @@ let textoActual: HTMLElement | null = null;
 const llamadas = new Map<string, { nombre: string; args: Record<string, unknown>; caja: HTMLElement; resolver: (r: CallToolResult) => void; rechazar: (e: unknown) => void }>();
 
 function burbuja(rol: "persona" | "agente" | "evento", cuando?: string | number) {
+  mensajesEl.querySelector(".bienvenida")?.remove();
   const b = document.createElement("article");
   b.className = `mensaje ${rol}`;
-  b.innerHTML = `<header><span class="rol">${rol === "persona" ? "vos" : rol === "agente" ? esc(NOMBRE[AGENTE] ?? AGENTE) : "evento"}</span><span class="cuando">${esc(hora(cuando))}</span></header><div class="contenido"></div>`;
+  b.innerHTML = `<header><span class="rol">${rol === "persona" ? "vos" : rol === "agente" ? "pickagent" : "evento"}</span><span class="cuando">${esc(hora(cuando))}</span></header><div class="contenido"></div>`;
   mensajesEl.append(b);
   b.scrollIntoView({ block: "end" });
   return b;
@@ -102,7 +124,7 @@ function abrirLlamada(id: string, nombre: string, args: Record<string, unknown>)
   textoActual = null;
   const caja = document.createElement("div");
   caja.className = "llamada";
-  caja.innerHTML = `<span class="marca">…</span> usando <code>${esc(toolDelServidor(nombre))}</code>`;
+  caja.innerHTML = `<span class="marca">${icono("circle-notch")}</span> usando <code>${esc(toolDelServidor(nombre))}</code>`;
   contenido(burbujaActual!).append(caja);
   let resolver!: (r: CallToolResult) => void;
   let rechazar!: (e: unknown) => void;
@@ -128,7 +150,7 @@ function abrirLlamada(id: string, nombre: string, args: Record<string, unknown>)
 function cerrarLlamada(id: string, resultado: unknown, error?: boolean) {
   const l = llamadas.get(id);
   if (!l) return;
-  l.caja.innerHTML = `<span class="marca ${error ? "mal" : "ok"}">${error ? "✕" : "✓"}</span> ${error ? "falló" : "usó"} <code>${esc(toolDelServidor(l.nombre))}</code>`;
+  l.caja.innerHTML = `<span class="marca ${error ? "mal" : "ok"}">${icono(error ? "x" : "check")}</span> ${error ? "falló" : "usó"} <code>${esc(toolDelServidor(l.nombre))}</code>`;
   const r = resultado as { content?: unknown; structuredContent?: unknown; isError?: boolean } | null;
   const comoResultado: CallToolResult = r && Array.isArray(r.content)
     ? (r as CallToolResult)
@@ -171,7 +193,7 @@ function pintarHistorial(mensajes: { role: string; content?: unknown; createdAt?
         if (p.type?.startsWith("tool") && p.toolName) {
           const caja = document.createElement("div");
           caja.className = "llamada";
-          caja.innerHTML = `<span class="marca ok">✓</span> usó <code>${esc(toolDelServidor(p.toolName))}</code>`;
+          caja.innerHTML = `<span class="marca ok">${icono("check")}</span> usó <code>${esc(toolDelServidor(p.toolName))}</code>`;
           cont.append(caja);
           const rs = ubicar(servidores, p.toolName);
           const salida = p.output ?? p.result;
@@ -192,13 +214,15 @@ function pintarHistorial(mensajes: { role: string; content?: unknown; createdAt?
       }
     }
   }
+  pintarBienvenida();
   mensajesEl.lastElementChild?.scrollIntoView({ block: "end" });
 }
 
 const mastra = new MastraClient({ baseUrl: MASTRA });
-const agente = mastra.getAgent(AGENTE);
+const agente = mastra.getAgent("asistente");
 
 async function enviar(texto: string, desdeVista = false) {
+  if (sinModeloLocal) return;
   if (!texto.trim()) return;
   if (!desdeVista) {
     const b = burbuja("persona");
@@ -265,6 +289,12 @@ function burbujaSignalOUsuario(t: string) {
   if (t.includes("<untrusted-mcp-event-data>")) evento(t);
 }
 
+inputEl.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+  event.preventDefault();
+  if (!enviarBtn.disabled) formEl.requestSubmit(enviarBtn);
+});
+
 formEl.addEventListener("submit", (e) => {
   e.preventDefault();
   const t = inputEl.value;
@@ -272,23 +302,6 @@ formEl.addEventListener("submit", (e) => {
   void enviar(t);
 });
 
-/* El switch de agente y el interruptor de belo cambian la URL y recargan: cada agente tiene su hilo. */
-document.getElementById("quien")!.textContent = NOMBRE[AGENTE] ?? AGENTE;
-const ir = (agente: string) => {
-  const u = new URL(location.href);
-  u.searchParams.set("agente", agente);
-  location.href = u.href;
-};
-document.querySelectorAll<HTMLButtonElement>("button[data-agente]").forEach((b) => {
-  b.classList.toggle("activo", (b.dataset.agente === "asistente") === ES_ASISTENTE);
-  b.addEventListener("click", () => ir(b.dataset.agente === "asistente" ? (CON_BELO ? "asistente" : "asistente-sin-belo") : "pickagent"));
-});
-const beloSwitch = document.getElementById("belo-switch") as HTMLInputElement;
-const beloEtiqueta = document.getElementById("belo-etiqueta")!;
-beloSwitch.checked = CON_BELO;
-beloEtiqueta.textContent = CON_BELO ? "belo conectado" : "belo desconectado";
-(beloSwitch.closest(".interruptor") as HTMLElement).hidden = !ES_ASISTENTE;
-beloSwitch.addEventListener("change", () => ir(beloSwitch.checked ? "asistente" : "asistente-sin-belo"));
 (async () => {
   const partes: string[] = [];
   for (const [nombre, url] of Object.entries(SERVERS)) {
@@ -301,6 +314,6 @@ beloSwitch.addEventListener("change", () => ir(beloSwitch.checked ? "asistente" 
       console.error(`server ${nombre}:`, e);
     }
   }
-  document.getElementById("servidor")!.textContent = partes.join(" / ");
+  console.info("Conexión de servicios:", partes.join(" / "));
   await suscribir();
 })().catch((e) => estado(`no pude conectar: ${e instanceof Error ? e.message : e}`, true));

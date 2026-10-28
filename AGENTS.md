@@ -54,7 +54,6 @@ cd interfaces/web/agente/pantalla && npm ci
 cat > .env <<EOT
 VITE_MASTRA_URL=http://localhost:4111
 VITE_BELO_MCP_URL=http://localhost:3001/mcp
-VITE_PICKAGENT_BELO_MCP_URL=http://localhost:3004/mcp
 VITE_LOGISTICA_MCP_URL=http://localhost:3002/mcp
 EOT
 npm run dev

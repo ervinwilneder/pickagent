@@ -8,6 +8,7 @@
  * secundario, verde para acción y estado bueno, naranja para alerta.
  */
 @import "./fuentes.css";
+@import "../../../../shared/ui/dividers.css";
 
 :root {
   --negro: #050606;
@@ -89,6 +90,7 @@ button, input { font: inherit; color: inherit; }
 .filas { display: grid; }
 .fila { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 9px 0; border-top: 1px dotted var(--linea); align-items: baseline; }
 .fila:first-child { border-top: 0; padding-top: 0; }
+.cabecera, .pie, .punteado, .fila { border-image: var(--divisor-horizontal) 1; }
 .fila .quien { grid-column: 1; grid-row: 1; font-family: var(--texto); font-weight: 700; font-size: 14px; color: var(--papel); min-width: 0; overflow-wrap: anywhere; }
 .fila .detalle { grid-column: 1; grid-row: 2; font-size: 11px; color: var(--apagado); min-width: 0; overflow-wrap: anywhere; }
 .fila .monto { grid-column: 2; grid-row: 1 / span 2; align-self: center; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -117,6 +119,9 @@ code, .codigo, .fila .quien.codigo { font-family: var(--mono); font-weight: 400;
 .entrada input::placeholder { color: var(--apagado); }
 .entrada input:focus { outline: none; }
 .entrada .boton { border: 0; border-left: 1px solid var(--linea); border-radius: 0; }
+.entrada .boton { border-image: var(--divisor-vertical) 1; }
+
+@media (forced-colors: active) { .cabecera, .pie, .punteado, .fila, .entrada .boton { border-image: none; } }
 
 /* Cuenta regresiva de la cotización. */
 .vence { display: grid; gap: 6px; font-size: 11px; color: var(--apagado); letter-spacing: .04em; }

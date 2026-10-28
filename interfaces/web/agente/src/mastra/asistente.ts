@@ -1,7 +1,6 @@
 /**
- * El asistente personal de la persona: su propio agente, que usa a pickagent
- * como un servicio. Hay dos versiones para mostrar la diferencia: con el MCP
- * de belo de la persona conectado, y sin él.
+ * Atención al cliente de PickAgent: un único modo, con logística y la cuenta
+ * Belo de la persona. El agente de la empresa sigue operando internamente.
  */
 import { Agent } from "@mastra/core/agent";
 
@@ -18,8 +17,6 @@ const servidorLogistica = process.env.LOGISTICA_MCP_URL!;
 
 /** La persona con belo conectado: el motor de envíos y su cuenta de belo. */
 export const conBelo = new MCPClient({ id: "asistente-con-belo", servers: { logistica: { url: new URL(servidorLogistica) }, belo: { url: new URL(servidorBelo) } } });
-/** La misma persona sin belo: solo el motor de envíos. */
-export const sinBelo = new MCPClient({ id: "asistente-sin-belo", servers: { logistica: { url: new URL(servidorLogistica) } } });
 
 /** Preguntarle a pickagent: el agente de la empresa planifica y recomienda. */
 const preguntarAPickagent = createTool({
@@ -44,7 +41,7 @@ export const eventosAsistente = new MCPEventsSignalProvider({ id: "asistente-eve
 
 export const asistente = new Agent({
   id: "asistente",
-  name: "Mi asistente (con belo)",
+  name: "PickAgent",
   description: "El asistente personal de la persona, con su cuenta de belo conectada: paga los envíos en un paso, con descuento, y confirma solo cuando sale el pago.",
   instructions: () => `${base}\n\n${ahora()}\n\nTenés conectada la cuenta de belo de la persona (belo_*). Eso te da tres ventajas que tenés que usar y contar cuando vengan al caso:
 1. Precio con belo: las ofertas traen un precio de lista y un precio pagando con belo, más barato. Siempre mostrá el ahorro.
@@ -57,16 +54,6 @@ Mover plata es siempre cotizar y que la persona apruebe; nunca confirmes sin su 
   tools: { ...(await conBelo.listTools()), preguntar_a_pickagent: preguntarAPickagent },
   memory: new Memory({ storage }),
   signals: [eventosAsistente],
-});
-
-export const asistenteSinBelo = new Agent({
-  id: "asistente-sin-belo",
-  name: "Mi asistente (sin belo)",
-  description: "El mismo asistente personal, sin belo conectado: consigue las ofertas pero el pago queda a cargo de la persona.",
-  instructions: () => `${base}\n\n${ahora()}\n\nNo tenés conectada ninguna cuenta de belo. Podés reservar (siempre con modoPago "anticipado"), pero el pago queda a cargo de la persona: pasale el CVU o belotag del transportista y el monto de lista (sin el descuento por belo), y decile que la reserva queda pendiente hasta que el transportista vea el pago. Cuando corresponda, contale en una línea que si conecta su cuenta de belo paga en un paso, con descuento, con confirmación automática, y puede pagar contra entrega con belo air, acercando su teléfono al del chofer cuando retira o entrega.`,
-  model: process.env.BELO_AGENTE_MODELO ?? "anthropic/claude-sonnet-5-5",
-  tools: { ...(await sinBelo.listTools()), preguntar_a_pickagent: preguntarAPickagent },
-  memory: new Memory({ storage }),
 });
 
 export const hiloAsistente = { resourceId: process.env.BELO_AGENTE_PERSONA ?? "ervin", threadId: "asistente" };

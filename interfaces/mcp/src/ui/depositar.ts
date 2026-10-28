@@ -1,6 +1,6 @@
 /** Vista "depositar": CVU y alias en pesos, y direcciones cripto agrupadas por moneda, con copiar. */
 import type { CallToolResult } from "@modelcontextprotocol/client";
-import { conectar, datos, el, esc, moneda, textoDeError } from "./comun.ts";
+import { conectar, datos, el, esc, mensajeConIcono, moneda, textoDeError } from "./comun.ts";
 
 interface Direccion { currencyCode: string; network: string; value: string }
 
@@ -35,7 +35,7 @@ function pintar(result: CallToolResult) {
     b.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(b.dataset.valor!);
-        b.textContent = "[OK] copiado";
+        mensajeConIcono(b, "check", "copiado");
         setTimeout(() => (b.textContent = "Copiar"), 1500);
       } catch {
         b.textContent = "seleccioná y copiá";

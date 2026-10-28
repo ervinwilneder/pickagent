@@ -2,29 +2,39 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light dark">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#05060f">
   <title>pickagent</title>
 </head>
 <body>
+  <a class="salto" href="#texto">Ir al mensaje</a>
   <main class="pantalla">
     <header class="barra">
-      <a class="marca-belo" href="/">pickagent</a> <span class="apagado">· <span id="quien">pickagent</span></span>
-      <span class="centro controles">
-        <span class="switch" role="group" aria-label="Agente"><button type="button" data-agente="pickagent">pickagent</button><button type="button" data-agente="asistente">mi asistente</button></span>
-        <label class="interruptor" hidden><input type="checkbox" id="belo-switch"><span class="pista"><span class="perilla"></span></span><span id="belo-etiqueta">belo conectado</span></label>
-        <span class="apagado" id="servidor">conectando</span>
-      </span>
-      <span class="estado" id="estado">iniciando</span>
+      <a class="marca-belo" href="/">pickagent</a>
     </header>
-    <section class="hilo" id="mensajes" aria-live="polite"></section>
-    <form class="composer" id="composer">
-      <span class="prompt-mark">$</span>
-      <input id="texto" type="text" placeholder="Contá qué querés mandar" autocomplete="off">
-      <button class="boton primario" id="enviar" type="submit">Enviar ↵</button>
-    </form>
-    <footer class="pie"><span>transportistas <b>agregados</b></span><span>pagos <b>con belo</b></span><span>eventos <b>en vivo</b></span><span>mcp <b>apps + events</b></span></footer>
+    <section class="hilo" id="mensajes" aria-label="Conversación" aria-live="polite"></section>
+    <div class="zona-composer">
+      <form class="composer" id="composer" aria-label="Escribir un mensaje">
+        <label class="sr-only" for="texto">Tu mensaje</label>
+        <textarea id="texto" rows="4" placeholder="¿Qué querés mandar?" autocomplete="off" aria-describedby="ayuda-mensaje"></textarea>
+        <button class="boton primario" id="enviar" type="submit">Enviar <span data-icono="arrow-up" aria-hidden="true"></span></button>
+      </form>
+      <p class="error-mensaje" id="error-mensaje" role="alert" hidden></p>
+      <p class="ayuda-mensaje" id="ayuda-mensaje">Los pagos requieren tu aprobación.</p>
+    </div>
+    <footer class="pie"><span>transportistas <b>agregados</b> · pagos <b>con belo</b></span></footer>
   </main>
+  <template id="bienvenida-template">
+    <div class="bienvenida">
+      <h1>Contá qué querés mandar.</h1>
+      <p>De dónde a dónde, qué llevás y para cuándo.<br>El agente te ayuda a encontrar el envío.</p>
+      <div class="ejemplos" role="group" aria-label="Ejemplos para empezar">
+        <button type="button" data-ejemplo="Quiero mandar mercadería a ">Quiero mandar mercadería a... <span data-icono="arrow-up-right" aria-hidden="true"></span></button>
+        <button type="button" data-ejemplo="Compará opciones de envío">Compará opciones de envío... <span data-icono="arrow-up-right" aria-hidden="true"></span></button>
+      </div>
+    </div>
+  </template>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
  * final. Si venció, vuelve a cotizar con los mismos argumentos.
  */
 import type { CallToolResult } from "@modelcontextprotocol/client";
-import { conectar, datos, el, esc, fmt, hora, textoDeError } from "./comun.ts";
+import { conectar, datos, el, esc, fmt, hora, icono, mensajeConIcono, textoDeError } from "./comun.ts";
 
 interface Operacion {
   tipo: "transferencia" | "conversion" | "pix";
@@ -58,14 +58,14 @@ function pintar(result: CallToolResult) {
   ].join("");
   cuerpo.replaceChildren(
     el("p", "prompt", esc(`belo ${o.tipo} --monto ${o.monto} ${o.moneda}${o.destino.nombre ? ` --a "${o.destino.nombre}"` : ""}`)),
-    el("div", "titulo", `<em>&gt;</em> ${esc(o.titulo)}`),
+    el("div", "titulo", `<em>${icono("arrow-right")}</em> ${esc(o.titulo)}`),
     el("div", "grande", `${esc(fmt(o.monto, o.moneda))}<small>${esc(o.moneda)}</small>`),
     el("div", "fila", `<span class="quien">${o.destino.nombre ? esc(o.destino.nombre) : "<span class='marca'>sin nombre</span>"}</span><span class="detalle">${esc(o.destino.detalle)}</span>`),
     el("hr", "punteado"),
     el("dl", "pares", pares),
     el("hr", "punteado"),
     el("div", "vence", `<span><span class="texto"></span></span><div class="barra"><i></i></div>`),
-    el("div", "acciones", `<button class="boton primario" id="aprobar" type="button">Aprobar en belo ↵</button><button class="boton" id="recotizar" type="button">Recotizar</button>`),
+    el("div", "acciones", `<button class="boton primario" id="aprobar" type="button">Aprobar en belo ${icono("arrow-up-right")}</button><button class="boton" id="recotizar" type="button">Recotizar</button>`),
     el("div", "resultado", ""),
   );
   cuerpo.querySelector("#aprobar")!.addEventListener("click", aprobar);
@@ -89,15 +89,15 @@ function cuentaRegresiva() {
 async function aprobar() {
   if (!actual) return;
   const boton = cuerpo.querySelector("#aprobar") as HTMLButtonElement;
-  const resultado = cuerpo.querySelector(".resultado")!;
+  const resultado = cuerpo.querySelector<HTMLElement>(".resultado")!;
   boton.disabled = true;
   resultado.className = "resultado";
-  resultado.textContent = "[..] confirmando";
+  mensajeConIcono(resultado, "circle-notch", "confirmando");
   const r = await app.callServerTool({ name: "confirmar", arguments: { tipo: actual.tipo, id: actual.id } });
   const error = textoDeError(r);
   if (error) {
     resultado.className = "resultado mal";
-    resultado.textContent = `[!!] ${error}`;
+    mensajeConIcono(resultado, "warning-circle", error);
     boton.disabled = false;
     return;
   }
@@ -106,14 +106,14 @@ async function aprobar() {
   cuerpo.querySelector(".vence")?.remove();
   if (c.linkDeAprobacion) {
     estado("esperando_tu_ok");
-    resultado.innerHTML = `[..] aprobala en belo: <a href="${esc(c.linkDeAprobacion)}" id="link" target="_blank" rel="noopener">abrir belo ↗</a>`;
+    resultado.innerHTML = `${icono("clock")} aprobala en belo: <a href="${esc(c.linkDeAprobacion)}" id="link" target="_blank" rel="noopener">abrir belo ${icono("arrow-up-right")}</a>`;
     cuerpo.querySelector("#link")!.addEventListener("click", (e) => {
       e.preventDefault();
       void app.openLink({ url: c.linkDeAprobacion! });
     });
     void app.openLink({ url: c.linkDeAprobacion });
   } else {
-    resultado.textContent = `[..] ${c.resumen}`;
+    mensajeConIcono(resultado, "clock", c.resumen);
   }
   void app.updateModelContext({ content: [{ type: "text", text: `La persona aprobó la operación ${actual.id}; estado ${c.estado}${c.linkDeAprobacion ? ", pendiente de aprobación en belo" : ""}.` }] });
   sondeo = window.setInterval(() => void verEstado(), 3000);
@@ -124,24 +124,24 @@ async function verEstado() {
   const r = await app.callServerTool({ name: "estado", arguments: { id: actual.id } });
   if (textoDeError(r)) return;
   const { movimiento } = datos<Estado>(r);
-  const resultado = cuerpo.querySelector(".resultado")!;
+  const resultado = cuerpo.querySelector<HTMLElement>(".resultado")!;
   if (movimiento.estado === "success") {
     clearInterval(sondeo);
     estado("ejecutada");
     resultado.className = "resultado ok";
-    resultado.textContent = "[OK] listo: la operación se hizo.";
+    mensajeConIcono(resultado, "check-circle", "listo: la operación se hizo.");
   } else if (movimiento.estado === "failed") {
     clearInterval(sondeo);
     estado("fallida", true);
     resultado.className = "resultado mal";
-    resultado.textContent = "[!!] la operación no se pudo hacer. No se movió plata.";
+    mensajeConIcono(resultado, "warning-circle", "la operación no se pudo hacer. No se movió plata.");
   }
 }
 
 async function recotizar() {
   if (!actual) return;
   estado("cotizando");
-  cuerpo.querySelector(".resultado")!.textContent = "[..] cotizando de nuevo";
+  mensajeConIcono(cuerpo.querySelector<HTMLElement>(".resultado")!, "circle-notch", "cotizando de nuevo");
   pintar(await app.callServerTool({ name: actual.recotizar.tool, arguments: actual.recotizar.arguments }));
 }
 

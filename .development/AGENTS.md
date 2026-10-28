@@ -33,8 +33,8 @@ EGM artifact directory: .development/designs
 
 - `interfaces/web/agente`: los agentes sobre Mastra (diseños en
   `designs/agente.md` y `designs/pickagent.md`): pickagent (conectado a
-  logística y belo, expuesto además como MCP), el asistente personal con
-  belo y sin belo, señales por eventos de belo, memoria en LibSQL, Studio en
+  logística y belo, expuesto además como MCP), la atención al cliente con
+  belo, señales por eventos de belo, memoria en LibSQL, Studio en
   `:4111` y la pantalla propia en `pantalla/` (`:5173`, publicada en
   `pickagent.vercel.app`: landing en `/`, app en `/app.html`, sandbox en
   `pickagent-sandbox.vercel.app`; identidad propia de pickagent, no la de belo).
@@ -66,9 +66,9 @@ EGM artifact directory: .development/designs
   menos comisión, desde su belo) existe en el motor como proceso de fondo:
   no se ve en la conversación ni en la demo. Contra entrega con belo air: cobra el
   chofer y el neteo descuenta la comisión. Un solo cliente, ya logueado.
-  Tres agentes en Studio (`:4111`) y en la pantalla
-  (`pickagent.vercel.app/app.html`, switch pickagent / mi asistente e interruptor
-  "belo conectado"). Servers locales: belo cliente `:3001`, belo pickagent
+  Dos agentes internos en Studio (`:4111`); la pantalla tiene un único modo
+  PickAgent con Belo conectado (`pickagent.vercel.app/app.html`), sin selector.
+  Servers locales: belo cliente `:3001`, belo pickagent
   `:3004` (cuentas de ejemplo enlazadas), belo staging `:3003`, logística
   `:3002`; túneles para los dos belo, logística y el agente.
 - Pendiente con belo: permiso de transferencias para la key de staging (hoy

@@ -1,6 +1,6 @@
 /** Vista "pedido": el formulario de envío, precargado con lo que el agente ya sabe. Al confirmar, registra el pedido y le avisa al chat. */
 import type { CallToolResult } from "@modelcontextprotocol/client";
-import { conectar, datos, esc, textoDeError } from "./comun.ts";
+import { conectar, datos, esc, mensajeConIcono, textoDeError } from "./comun.ts";
 
 interface Borrador { origen?: string; destino?: string; direccionOrigen?: string; direccionDestino?: string; fechaLimite?: string; mercaderia?: string; pesoKg?: number; volumenM3?: number; cuidados?: string[]; fragil?: boolean; refrigerado?: boolean; valorDeclarado?: number; contacto?: string; notas?: string }
 
@@ -46,7 +46,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   boton.disabled = true;
   resultadoEl.className = "resultado";
-  resultadoEl.textContent = "[..] registrando el pedido";
+  mensajeConIcono(resultadoEl, "circle-notch", "registrando el pedido");
   const args = {
     origen: campo("origen").value,
     destino: campo("destino").value,
@@ -65,13 +65,13 @@ form.addEventListener("submit", async (e) => {
   const error = textoDeError(r);
   if (error) {
     resultadoEl.className = "resultado mal";
-    resultadoEl.textContent = `[!!] ${error}`;
+    mensajeConIcono(resultadoEl, "warning-circle", error);
     boton.disabled = false;
     return;
   }
   const { pedidoId, resumen } = datos<{ pedidoId: string; resumen: string }>(r);
   resultadoEl.className = "resultado ok";
-  resultadoEl.textContent = `[OK] ${resumen}`;
+  mensajeConIcono(resultadoEl, "check-circle", resumen);
   estadoEl.textContent = "pedido registrado";
   form.querySelectorAll("input").forEach((i) => (i.disabled = true));
   await app.sendMessage({ role: "user", content: [{ type: "text", text: `Confirmé el pedido de envío ${pedidoId}: ${resumen} Buscá las ofertas.` }] });

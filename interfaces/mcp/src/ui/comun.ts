@@ -2,6 +2,10 @@
 import { App } from "@modelcontextprotocol/ext-apps";
 import type { CallToolResult } from "@modelcontextprotocol/client";
 import "./estilos.css";
+import { montarIconos } from "../../../../shared/ui/phosphor.ts";
+export { icono, marcaEstado, mensajeConIcono } from "../../../../shared/ui/phosphor.ts";
+
+montarIconos();
 
 export const moneda = (c: string) => (c === "ARGt" ? "ARS" : c);
 

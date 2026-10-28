@@ -6,6 +6,7 @@
  * los mismos tokens.
  */
 @import "./fuentes.css";
+@import "../../../../shared/ui/dividers.css";
 
 :root {
   --fondo: #f3f5f8;
@@ -40,7 +41,6 @@ button, input { font: inherit; color: inherit; }
 .panel { background: var(--papel); border: 1px solid var(--linea); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 2px rgba(16, 25, 43, .06); }
 .cabecera { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--linea); }
 .cabecera > span:first-child { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .02em; }
-.cabecera > span:first-child::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--ambar); margin-right: 8px; transform: rotate(45deg); vertical-align: 1px; }
 .cabecera .estado { font-family: var(--mono); font-size: 11px; color: var(--positivo); background: var(--positivo-tenue); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
 .cabecera .estado.alerta { color: var(--alerta); background: var(--alerta-tenue); }
 .cuerpo { padding: 16px; display: grid; gap: 14px; }
@@ -71,6 +71,7 @@ code, .codigo { font-family: var(--mono); font-size: 12px; word-break: break-all
 .filas { display: grid; }
 .fila { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 10px 0; border-top: 1px solid var(--linea); align-items: baseline; }
 .fila:first-child { border-top: 0; padding-top: 0; }
+.cabecera, .pie, .punteado, .fila { border-image: var(--divisor-horizontal) 1; }
 .fila .quien { grid-column: 1; grid-row: 1; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
 .fila .detalle { grid-column: 1; grid-row: 2; font-size: 12px; color: var(--tenue); min-width: 0; overflow-wrap: anywhere; }
 .fila .monto { grid-column: 2; grid-row: 1 / span 2; align-self: center; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
@@ -91,6 +92,9 @@ code, .codigo { font-family: var(--mono); font-size: 12px; word-break: break-all
 .entrada input::placeholder { color: var(--tenue); }
 .entrada input:focus { outline: none; }
 .entrada .boton { border: 0; border-left: 1px solid var(--linea); border-radius: 0; }
+.entrada .boton { border-image: var(--divisor-vertical) 1; }
+
+@media (forced-colors: active) { .cabecera, .pie, .punteado, .fila, .entrada .boton { border-image: none; } }
 .resultado { font-size: 13px; min-height: 1.5em; }
 .resultado.ok { color: var(--positivo); }
 .resultado.mal { color: var(--alerta); }

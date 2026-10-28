@@ -1,0 +1,4 @@
+:root {
+  --divisor-horizontal: linear-gradient(90deg, transparent 0%, var(--linea) 50%, transparent 100%);
+  --divisor-vertical: linear-gradient(180deg, transparent 0%, var(--linea) 50%, transparent 100%);
+}

@@ -4,7 +4,7 @@
  * le manda un mensaje a la conversación para que el agente reaccione.
  */
 import type { CallToolResult } from "@modelcontextprotocol/client";
-import { conectar, datos, el, esc, fmt, hora, sinHost, textoDeError } from "./comun.ts";
+import { conectar, datos, el, esc, fmt, hora, marcaEstado, sinHost, textoDeError } from "./comun.ts";
 
 interface Movimiento { id: string; tipo: string; estado: string; monto: string; moneda: string; contraparte: string | null; fecha: string }
 interface Inicio { desde: string; tipo: string | null; demo: boolean }
@@ -84,7 +84,7 @@ async function avisar(m: Movimiento) {
   cuantosEl.textContent = String(vistos);
   if (vistos === 1) listaEl.replaceChildren();
   const entra = m.tipo === "deposit";
-  const marca = m.estado === "success" ? `<span class="marca ok">[OK]</span>` : m.estado === "failed" ? `<span class="marca mal">[!!]</span>` : `<span class="marca">[..]</span>`;
+  const marca = marcaEstado(m.estado);
   listaEl.prepend(el("div", "fila", `<span class="quien">${marca} ${esc(m.contraparte ?? (verbo[m.tipo] ?? m.tipo))}</span><span class="monto ${entra ? "entra" : "sale"}">${entra ? "+" : "−"}${esc(fmt(m.monto, m.moneda))} ${esc(m.moneda)}</span><span class="detalle">${esc(hora(m.fecha))} · ${esc(verbo[m.tipo] ?? m.tipo)} · avisado al chat</span>`));
   const texto = `Movimiento nuevo en mi cuenta de belo: ${describir(m)} (${m.estado === "success" ? "acreditado" : m.estado}). ¿Qué me conviene hacer con esto?`;
   void app.updateModelContext({ content: [{ type: "text", text: `Novedades de belo: ${vistos} movimientos desde ${hora(cursor)}. Último: ${describir(m)}.` }] });

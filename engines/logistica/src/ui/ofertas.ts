@@ -1,6 +1,6 @@
 /** Vista "ofertas": las mejores ofertas para un pedido; elegir una le avisa al chat para reservar y pagar por belo. */
 import type { CallToolResult } from "@modelcontextprotocol/client";
-import { conectar, datos, el, esc, textoDeError } from "./comun.ts";
+import { conectar, datos, el, esc, icono, textoDeError } from "./comun.ts";
 
 interface Pedido { origen: { localidad: { nombre: string } }; destino: { localidad: { nombre: string } }; mercaderia: string; pesoKg: number; fechaLimite: string }
 interface Oferta { id: string; transportista: { nombre: string; calificacion: number; modo: string }; servicio: string; vehiculo: string; distanciaKm: number; horasViaje: number; retiro: string; entrega: string; precio: number; precioBelo: number; descuentoBelo: number; contraEntrega?: boolean; condiciones?: string[] }
@@ -27,7 +27,7 @@ function pintar(result: CallToolResult) {
     const de = pedido.origen.localidad.nombre;
     const a = pedido.destino.localidad.nombre;
     promptEl.textContent = `${pedido.mercaderia}, ${pedido.pesoKg} kg · entregar antes de ${cuando(pedido.fechaLimite)}`;
-    rutaEl.innerHTML = `${esc(de)} <em>→</em> ${esc(a)}${ofertas[0] ? ` <span class="chip">${ofertas[0].distanciaKm} km</span>` : ""}`;
+    rutaEl.innerHTML = `${esc(de)} <em>${icono("arrow-right")}</em> ${esc(a)}${ofertas[0] ? ` <span class="chip">${ofertas[0].distanciaKm} km</span>` : ""}`;
   }
   estadoEl.textContent = ofertas.length ? `${ofertas.length} ofertas` : "sin ofertas";
   estadoEl.className = ofertas.length ? "estado" : "estado alerta";
@@ -37,7 +37,7 @@ function pintar(result: CallToolResult) {
     ...ofertas.map((o, i) =>
       el("article", `oferta${i === 0 ? " mejor" : ""}`, `
         <div>
-          <div class="proveedor">${esc(o.transportista.nombre)} <span class="chip ${i === 0 ? "verde" : ""}">${i === 0 ? "mejor precio" : `★ ${o.transportista.calificacion.toFixed(1)}`}</span>${o.transportista.modo === "conectado" ? ` <span class="chip">api</span>` : ""}${o.contraEntrega ? ` <span class="chip">contra entrega con belo air</span>` : ""}</div>
+          <div class="proveedor">${esc(o.transportista.nombre)} <span class="chip ${i === 0 ? "verde" : ""}"${i === 0 ? "" : ` role="img" aria-label="Calificación ${o.transportista.calificacion.toFixed(1)} de 5"`}>${i === 0 ? "mejor precio" : `${icono("star")} ${o.transportista.calificacion.toFixed(1)}`}</span>${o.transportista.modo === "conectado" ? ` <span class="chip">api</span>` : ""}${o.contraEntrega ? ` <span class="chip">contra entrega con belo air</span>` : ""}</div>
           <div class="detalle">${esc(o.servicio)} · ${esc(vehiculo[o.vehiculo] ?? o.vehiculo)} · ${o.horasViaje} h</div>
           <div class="detalle">retiro ${esc(cuando(o.retiro))} · entrega ${esc(cuando(o.entrega))}</div>
           ${o.condiciones?.length ? `<div class="detalle">${esc(o.condiciones.join(" · "))}</div>` : ""}
@@ -47,7 +47,7 @@ function pintar(result: CallToolResult) {
           <span class="belo">${esc(pesos(o.precioBelo))}<small>ARS con belo</small></span>
           <span class="detalle">${Math.round(o.descuentoBelo * 100)} % off pagando por belo</span>
         </div>
-        <div class="acciones"><button class="boton ${i === 0 ? "primario" : ""}" data-id="${esc(o.id)}" data-texto="${esc(`${o.transportista.nombre}, ${o.servicio}, entrega ${cuando(o.entrega)}, ${pesos(o.precioBelo)} ARS pagando con belo`)}" type="button">Elegir y pagar con belo ↵</button></div>`),
+        <div class="acciones"><button class="boton ${i === 0 ? "primario" : ""}" data-id="${esc(o.id)}" data-texto="${esc(`${o.transportista.nombre}, ${o.servicio}, entrega ${cuando(o.entrega)}, ${pesos(o.precioBelo)} ARS pagando con belo`)}" type="button">Elegir y pagar con belo ${icono("arrow-right")}</button></div>`),
     ),
   );
   lista.querySelectorAll<HTMLButtonElement>("button[data-id]").forEach((b) =>

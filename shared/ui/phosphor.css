@@ -1,0 +1,12 @@
+.icono-phosphor {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  flex: 0 0 auto;
+  vertical-align: -.17em;
+  fill: currentColor;
+  pointer-events: none;
+}
+.icono-phosphor.girando { animation: giro-phosphor 1s linear infinite; }
+@keyframes giro-phosphor { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .icono-phosphor.girando { animation: none; } }

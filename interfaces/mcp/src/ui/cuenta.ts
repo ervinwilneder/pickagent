@@ -1,6 +1,6 @@
 /** Vista "cuenta": saldos con rendimiento y últimos movimientos, en los términos de belo. */
 import type { CallToolResult } from "@modelcontextprotocol/client";
-import { conectar, datos, el, esc, fecha, fmt, hora, moneda, textoDeError } from "./comun.ts";
+import { conectar, datos, el, esc, fecha, fmt, hora, marcaEstado, moneda, textoDeError } from "./comun.ts";
 
 interface Saldo { currencyCode: string; available: string; yield?: { rate: string; totalYield?: string } }
 interface Movimiento {
@@ -39,7 +39,7 @@ function pintar(result: CallToolResult) {
       const quien = m.receipt?.counterparty?.name ?? (m.type === "swap" ? `Conversión ${m.receipt?.conversion?.pairCode?.replace("ARGt", "ARS") ?? ""}` : "Movimiento");
       const debito = m.receipt?.debits?.[0];
       const monto = m.type === "pix_payout" && m.receipt?.netAmount ? `${fmt(m.receipt.netAmount, m.receipt.netCurrency ?? "BRL")} ${moneda(m.receipt.netCurrency ?? "BRL")}` : `${fmt(m.amount ?? "0", m.currency ?? "")} ${moneda(m.currency ?? "")}`;
-      const marca = m.status === "success" ? `<span class="marca ok">[OK]</span>` : m.status === "failed" ? `<span class="marca mal">[!!]</span>` : `<span class="marca">[..]</span>`;
+      const marca = marcaEstado(m.status);
       const detalle = [fecha(m.createdAt), verbo[m.type] ?? m.type, debito && !entra && m.type !== "transfer" ? `salieron ${fmt(debito.amount, debito.currency)} ${moneda(debito.currency)}` : null, m.receipt?.counterparty?.bank ?? null].filter(Boolean).join(" · ");
       const clase = m.status !== "success" ? "pendiente" : entra ? "entra" : "sale";
       return el("div", "fila", `<span class="quien">${marca} ${esc(quien)}</span><span class="monto ${clase}">${entra ? "+" : "−"}${esc(monto)}</span><span class="detalle">${esc(detalle)}</span>`);

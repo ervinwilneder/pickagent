@@ -50,6 +50,7 @@ export const asistente = new Agent({
 1. Precio con belo: las ofertas traen un precio de lista y un precio pagando con belo, más barato. Siempre mostrá el ahorro.
 2. Pago en un paso: después de reservar, cotizá la transferencia en belo (belo_cotizar_transferencia con el destinatario y el monto que devuelve la reserva, moneda ARGt), mostrá la vista de aprobación y, cuando la persona apruebe, confirmá con belo_confirmar y marcá la reserva pagada con logistica_marcar_pagada. La persona no copia CVU ni montos.
 3. Confirmación automática: cuando te llega una notificación de un movimiento nuevo en belo que coincide con un pago de envío pendiente, marcá la reserva pagada y avisale a la persona con el código de seguimiento; no esperes a que pregunte.
+4. Pago contra entrega con belo air: belo air permite pedir y mandar plata acercando los teléfonos, entre usuarios de belo, al instante. Si la oferta elegida acepta contra entrega, ofrecé esa opción: la persona no paga nada ahora; cuando el chofer retira (o entrega), pide desde su belo el monto exacto de la reserva con belo air, la persona acerca su teléfono, revisa el monto y confirma, y la plata llega en el acto, sin efectivo ni CVU. Si la persona la elige, reservá con modoPago "contra_entrega_belo_air" y no cotices ninguna transferencia; cuando llegue el movimiento de belo del pago, marcá la reserva pagada y avisá. Es lo ideal cuando la persona quiere ver la carga retirada antes de pagar, o cuando quien paga es quien recibe.
 Además conocés sus saldos: si no le alcanza en pesos pero tiene USDT, proponé convertir con belo_cotizar_conversion antes de pagar.
 Mover plata es siempre cotizar y que la persona apruebe; nunca confirmes sin su "sí" a esa cotización exacta.`,
   model: process.env.BELO_AGENTE_MODELO ?? "anthropic/claude-sonnet-5-5",
@@ -62,7 +63,7 @@ export const asistenteSinBelo = new Agent({
   id: "asistente-sin-belo",
   name: "Mi asistente (sin belo)",
   description: "El mismo asistente personal, sin belo conectado: consigue las ofertas pero el pago queda a cargo de la persona.",
-  instructions: () => `${base}\n\n${ahora()}\n\nNo tenés conectada ninguna cuenta de belo. Podés reservar, pero el pago queda a cargo de la persona: pasale el CVU o belotag del transportista y el monto de lista (sin el descuento por belo), y decile que la reserva queda pendiente hasta que el transportista vea el pago. Cuando corresponda, contale en una línea que si conecta su cuenta de belo paga en un paso, con descuento y con confirmación automática.`,
+  instructions: () => `${base}\n\n${ahora()}\n\nNo tenés conectada ninguna cuenta de belo. Podés reservar (siempre con modoPago "anticipado"), pero el pago queda a cargo de la persona: pasale el CVU o belotag del transportista y el monto de lista (sin el descuento por belo), y decile que la reserva queda pendiente hasta que el transportista vea el pago. Cuando corresponda, contale en una línea que si conecta su cuenta de belo paga en un paso, con descuento, con confirmación automática, y puede pagar contra entrega con belo air, acercando su teléfono al del chofer cuando retira o entrega.`,
   model: process.env.BELO_AGENTE_MODELO ?? "anthropic/claude-sonnet-5-5",
   tools: { ...(await sinBelo.listTools()), preguntar_a_pickagent: preguntarAPickagent },
   memory: new Memory({ storage }),

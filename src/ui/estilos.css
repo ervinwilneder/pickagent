@@ -1,0 +1,157 @@
+/*
+ * Sistema visual de las vistas, con la estética de belo Agentic Banking:
+ * terminal sobre negro, monoespaciada para datos, condensada en mayúsculas
+ * para lo grande, verde lima para la acción. Es un look único y deliberado:
+ * el panel es oscuro también cuando el chat del host es claro.
+ *
+ * Tokens: negro de fondo, panel, línea, papel para el texto, apagado para lo
+ * secundario, verde para acción y estado bueno, naranja para alerta.
+ */
+@import "./fuentes.css";
+
+:root {
+  --negro: #050606;
+  --panel: #0c0e0d;
+  --panel-alto: #111412;
+  --linea: #303531;
+  --linea-suave: #1b1f1c;
+  --papel: #f1f2ec;
+  --apagado: #8d958f;
+  --verde: #b9ff18;
+  --verde-tenue: rgba(185, 255, 24, .12);
+  --naranja: #ff5a1f;
+  --azul: #292dff;
+  --display: "Sofia Sans Extra Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --mono: "Fragment Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --texto: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radio: 4px;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--negro);
+  color: var(--papel);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding: 0;
+}
+a { color: var(--verde); }
+button, input { font: inherit; color: inherit; }
+
+/* Panel: la unidad de cada vista. Barra de cabecera con etiqueta y estado. */
+.panel { background: var(--panel); border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; }
+.cabecera { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 14px; border-bottom: 1px solid var(--linea); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--apagado); }
+.cabecera .estado { color: var(--verde); white-space: nowrap; }
+.cabecera .estado.alerta { color: var(--naranja); }
+.cuerpo { padding: 16px 14px 14px; display: grid; gap: 14px; }
+.cuerpo > p { margin: 0; }
+.pie { display: flex; gap: 14px; flex-wrap: wrap; padding: 8px 14px; border-top: 1px solid var(--linea); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--apagado); }
+.pie b { color: var(--verde); font-weight: 400; }
+
+/* Línea de prompt: qué se pidió, como un comando. */
+.prompt { color: var(--papel); word-break: break-word; }
+.prompt::before { content: "$ "; color: var(--verde); }
+.nota { color: var(--apagado); }
+.nota::before { content: "// "; }
+
+/* Lo grande: la condensada en mayúsculas. */
+.grande { font-family: var(--display); font-weight: 700; font-size: 44px; line-height: .95; letter-spacing: -.01em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.grande small { font-size: .5em; color: var(--apagado); letter-spacing: 0; margin-left: 6px; }
+.titulo { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1; text-transform: uppercase; }
+.titulo em { font-style: normal; color: var(--naranja); }
+.seccion { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--apagado); display: flex; justify-content: space-between; gap: 10px; }
+
+/* Chips entre corchetes, como los códigos de país. */
+.chip { display: inline-block; border: 1px solid var(--linea); color: var(--papel); padding: 1px 6px; border-radius: 2px; font-size: 11px; letter-spacing: .04em; white-space: nowrap; }
+.chip::before { content: "["; color: var(--apagado); }
+.chip::after { content: "]"; color: var(--apagado); }
+.chip.verde { border-color: rgba(185, 255, 24, .5); color: var(--verde); }
+.chip.verde::before, .chip.verde::after { color: rgba(185, 255, 24, .6); }
+
+/* Divisores punteados y listas de pares. */
+.punteado { border: 0; border-top: 1px dotted var(--linea); margin: 0; }
+.pares { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; margin: 0; }
+.pares dt { color: var(--apagado); }
+.pares dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Saldos: una grilla de tiles. */
+.saldos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.saldo { border: 1px solid var(--linea-suave); background: var(--panel-alto); border-radius: var(--radio); padding: 10px 12px; display: grid; gap: 6px; justify-items: start; }
+.saldo .monto { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.saldo .rinde { font-size: 11px; color: var(--verde); }
+.saldo .rinde.nada { color: var(--apagado); }
+
+/* Filas: movimientos, contactos, direcciones. */
+.filas { display: grid; }
+.fila { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 9px 0; border-top: 1px dotted var(--linea); align-items: baseline; }
+.fila:first-child { border-top: 0; padding-top: 0; }
+.fila .quien { grid-column: 1; grid-row: 1; font-family: var(--texto); font-weight: 700; font-size: 14px; color: var(--papel); min-width: 0; overflow-wrap: anywhere; }
+.fila .detalle { grid-column: 1; grid-row: 2; font-size: 11px; color: var(--apagado); min-width: 0; overflow-wrap: anywhere; }
+.fila .monto { grid-column: 2; grid-row: 1 / span 2; align-self: center; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fila .filas { grid-column: 1 / -1; grid-row: 3; padding-left: 12px; border-left: 1px solid var(--linea-suave); margin-top: 6px; }
+.fila .monto.entra { color: var(--verde); }
+.fila .monto.sale { color: var(--papel); }
+.fila .monto.pendiente { color: var(--apagado); }
+.marca { color: var(--apagado); }
+.marca.ok { color: var(--verde); }
+.marca.mal { color: var(--naranja); }
+code, .codigo, .fila .quien.codigo { font-family: var(--mono); font-weight: 400; font-size: 12px; color: var(--papel); word-break: break-all; }
+
+/* Botones: el primario es el verde de belo; el secundario, solo borde. */
+.acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+.boton { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 10px 14px; border-radius: 2px; border: 1px solid var(--linea); background: transparent; color: var(--papel); cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.boton:hover { border-color: var(--papel); }
+.boton:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
+.boton:disabled { opacity: .45; cursor: default; }
+.boton.primario { background: var(--verde); border-color: var(--verde); color: var(--negro); font-weight: 700; flex: 1 1 auto; }
+.boton.primario:hover:not(:disabled) { background: #cbff4a; }
+.boton.chico { padding: 5px 9px; font-size: 11px; }
+
+/* Entrada de texto como la del waitlist. */
+.entrada { display: flex; border: 1px solid var(--linea); border-radius: 2px; background: var(--negro); }
+.entrada input { flex: 1; min-width: 0; background: transparent; border: 0; padding: 9px 12px; color: var(--papel); }
+.entrada input::placeholder { color: var(--apagado); }
+.entrada input:focus { outline: none; }
+.entrada .boton { border: 0; border-left: 1px solid var(--linea); border-radius: 0; }
+
+/* Cuenta regresiva de la cotización. */
+.vence { display: grid; gap: 6px; font-size: 11px; color: var(--apagado); letter-spacing: .04em; }
+.vence .barra { height: 3px; background: var(--linea-suave); border-radius: 2px; overflow: hidden; }
+.vence .barra i { display: block; height: 100%; background: var(--verde); transition: width .5s linear; }
+.vence.pronto { color: var(--naranja); }
+.vence.pronto .barra i { background: var(--naranja); }
+
+/* Resultado de una acción. */
+.resultado { font-size: 12px; min-height: 1.5em; }
+.resultado.ok { color: var(--verde); }
+.resultado.mal { color: var(--naranja); }
+.resultado a { color: var(--verde); }
+
+@media (prefers-reduced-motion: reduce) { .vence .barra i, .boton { transition: none; } }
+@media (max-width: 420px) { .grande { font-size: 36px; } .cuerpo { padding: 14px 12px 12px; } }
+
+/* Formulario de envío */
+.campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 12px; }
+.campo { display: grid; gap: 4px; }
+.campo label { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--apagado); }
+.campo input, .campo textarea { width: 100%; border: 1px solid var(--linea); border-radius: 2px; background: var(--negro); color: var(--papel); padding: 8px 10px; font: inherit; }
+.campo input:focus, .campo textarea:focus { outline: none; border-color: var(--verde); }
+.campo.ancho { grid-column: 1 / -1; }
+.marcas { display: flex; gap: 14px; align-items: center; font-size: 12px; }
+.marcas label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.marcas input { accent-color: var(--verde); }
+
+/* Ofertas */
+.oferta { border: 1px solid var(--linea-suave); background: var(--panel-alto); border-radius: var(--radio); padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 14px; align-items: start; }
+.oferta.mejor { border-color: rgba(185, 255, 24, .5); }
+.oferta .proveedor { font-family: var(--texto); font-weight: 700; font-size: 15px; }
+.oferta .detalle { font-size: 11px; color: var(--apagado); }
+.oferta .precios { text-align: right; display: grid; gap: 2px; justify-items: end; }
+.oferta .lista { font-size: 11px; color: var(--apagado); text-decoration: line-through; }
+.oferta .belo { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1; color: var(--verde); }
+.oferta .belo small { font-size: .5em; color: var(--apagado); margin-left: 4px; }
+.oferta .acciones { grid-column: 1 / -1; }

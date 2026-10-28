@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Pedido de envío</title>
+</head>
+<body>
+  <section class="panel" aria-label="Pedido de envío">
+    <header class="cabecera"><span>pickagent_envio</span><span class="estado" id="estado">completá el pedido</span></header>
+    <form class="cuerpo" id="form">
+      <p class="prompt">pickagent enviar --completar</p>
+      <div class="campos">
+        <div class="campo"><label for="origen">Retiro en</label><input id="origen" name="origen" list="localidades" required placeholder="Villa Crespo"></div>
+        <div class="campo"><label for="destino">Entrega en</label><input id="destino" name="destino" list="localidades" required placeholder="Rosario"></div>
+        <div class="campo"><label for="fechaLimite">Entregar antes de</label><input id="fechaLimite" name="fechaLimite" type="datetime-local" required></div>
+        <div class="campo"><label for="contacto">Contacto</label><input id="contacto" name="contacto" required placeholder="Nombre y teléfono"></div>
+        <div class="campo ancho"><label for="mercaderia">Qué se manda</label><input id="mercaderia" name="mercaderia" required placeholder="20 cajas de repuestos"></div>
+        <div class="campo"><label for="pesoKg">Peso total (kg)</label><input id="pesoKg" name="pesoKg" type="number" min="0.1" step="0.1" required placeholder="120"></div>
+        <div class="campo"><label for="volumenM3">Volumen total (m³)</label><input id="volumenM3" name="volumenM3" type="number" min="0.001" step="0.01" required placeholder="1.2"></div>
+        <div class="campo ancho marcas"><label><input type="checkbox" id="fragil" name="fragil"> frágil</label><label><input type="checkbox" id="refrigerado" name="refrigerado"> refrigerado</label></div>
+        <div class="campo ancho"><label for="notas">Notas</label><input id="notas" name="notas" placeholder="Horario de carga, acceso, lo que haga falta"></div>
+      </div>
+      <datalist id="localidades"></datalist>
+      <div class="acciones"><button class="boton primario" id="confirmar" type="submit">Buscar ofertas ↵</button></div>
+      <p class="resultado" id="resultado"></p>
+    </form>
+    <footer class="pie"><span>motor://<b>logistica</b></span><span>paga://<b>belo</b></span></footer>
+  </section>
+  <script type="module" src="./pedido.ts"></script>
+</body>
+</html>

@@ -19,7 +19,7 @@ body { background: var(--fondo); color: var(--tinta); font-family: var(--texto);
 
 /* Barra */
 .barra { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 12px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--linea); }
-.marca-belo { font-family: var(--display); font-weight: 700; font-size: 19px; letter-spacing: -.01em; display: inline-flex; align-items: center; gap: 8px; }
+.marca-belo { font-family: var(--display); font-weight: 700; font-size: 19px; letter-spacing: -.01em; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; }
 .marca-belo::before { content: ""; width: 12px; height: 12px; background: var(--ambar); border-radius: 3px; transform: rotate(45deg); }
 .marca-belo sup { display: none; }
 .apagado { color: var(--tenue); font-weight: 400; }

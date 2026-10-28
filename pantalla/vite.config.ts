@@ -36,5 +36,5 @@ function cspDelSandbox(): Plugin {
 
 export default defineConfig({
   plugins: [cspDelSandbox()],
-  build: { rollupOptions: { input: { index: "index.html", sandbox: "sandbox.html" } } },
+  build: { rollupOptions: { input: { index: "index.html", app: "app.html", sandbox: "sandbox.html" } } },
 });

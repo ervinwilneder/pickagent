@@ -75,17 +75,19 @@ html.con-revelado :is(h1 > span, .hero .bajada, .hero .acciones, .hero .muestra,
 .cierre { display: grid; justify-items: center; gap: 24px; text-align: center; padding-block: 96px; }
 .cierre p { max-width: 54ch; color: var(--tenue); }
 .cierre .boton { margin-top: 4px; }
-.pie-landing { display: grid; gap: 36px; padding-block: 32px 48px; border-top: 1px solid var(--linea); border-image: var(--divisor-horizontal) 1; }
-.pie-fila { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px 32px; }
+.pie-landing { display: grid; gap: 44px; padding-block: 40px 56px; border-top: 1px solid var(--linea); border-image: var(--divisor-horizontal) 1; }
+.pie-fila { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px 48px; }
 .pie-landing .marca { font-size: 24px; }
-.pie-leyenda { color: var(--tenue); font-size: 13.2px; }
-.pie-landing .enlace-texto { color: var(--tenue); font-size: 13.2px; }
-.pie-grupos { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 28px 56px; }
-.pie-grupo { display: grid; justify-items: start; gap: 10px; }
+.pie-leyenda { justify-self: center; color: var(--tenue); font-size: 13.2px; text-align: center; }
+.pie-landing .enlace-texto { justify-self: end; color: var(--tenue); font-size: 13.2px; }
+.pie-grupos { display: grid; grid-template-columns: auto auto auto; justify-content: space-between; align-items: start; gap: 32px 48px; }
+.pie-grupo { display: grid; justify-items: start; gap: 14px; }
 .pie-etiqueta { margin: 0; color: var(--tenue); font-size: 14px; }
-.pie-iconos { display: flex; gap: 8px; }
+.pie-iconos { display: flex; gap: 10px; }
 .boton-icono { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--linea-control); border-radius: 14px; background: transparent; color: var(--hielo); text-decoration: none; cursor: pointer; }
-.boton-icono svg { width: 20px; height: 20px; display: block; }
+.boton-icono svg { width: 19px; height: 19px; display: block; }
+.boton-icono[aria-label="X"] svg { width: 17px; height: 17px; }
+.boton-icono[data-ia="chatgpt"] svg, .boton-icono[data-ia="claude"] svg, .boton-icono[data-ia="perplexity"] svg { width: 20px; height: 20px; }
 .boton-icono:hover { background: var(--vidrio-fuerte); }
 .idioma { position: relative; }
 .boton-idioma { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px; border: 1px solid var(--linea-control); border-radius: 999px; background: transparent; color: var(--hielo); font: 500 16px/1.2 var(--texto); cursor: pointer; }
@@ -136,8 +138,9 @@ html.con-revelado :is(h1 > span, .hero .bajada, .hero .acciones, .hero .muestra,
   .numero { grid-row: 1 / 3; margin: 0; font-size: 24px; }
   .pasos h3, .pasos p { grid-column: 2; }
   .cierre { padding-block: 64px; }
-  .pie-fila { align-items: flex-start; }
-  .pie-leyenda { width: 100%; }
+  .pie-fila, .pie-grupos { grid-template-columns: 1fr; justify-content: start; gap: 28px; }
+  .pie-fila { align-items: start; }
+  .pie-leyenda, .pie-landing .enlace-texto { justify-self: start; text-align: left; }
   .pie-landing .enlace-texto { min-height: 29px; }
 }
 @media (max-width: 380px) {

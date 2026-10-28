@@ -39,7 +39,9 @@ de la aprobación. No se agregan métricas, clientes, precios ni capacidades.
   un enlace o botón se abre en un anillo de 100px; sobre un campo de texto
   se vuelve una barra. Al presionar se achica a 0,85. En táctil no aparece.
   Con movimiento reducido se pega al puntero, sin resorte.
-- El pie suma tres grupos. Las redes no navegan. ChatGPT, Claude, Gemini y
+- El pie reparte la marca, la leyenda y el enlace en una fila, y los tres
+  grupos van de punta a punta, con el mismo aire entre ellos. Los íconos de redes e IA son las
+  marcas de Loybox, a 44px. Las redes no navegan. ChatGPT, Claude, Gemini y
   Perplexity abren una pregunta sobre pickagent en ese idioma. El idioma
   reescribe toda la portada en español de Argentina, español de Latinoamérica
   o inglés, y la elección queda en el navegador.

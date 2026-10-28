@@ -11,10 +11,11 @@ y el motor de logística. La referencia visual es el front existente en
 Space Grotesk / Inter / JetBrains Mono y violeta para la acción principal.
 No se reemplaza el dominio de envíos por el simulador de entregas del prototipo.
 
-La primera adaptación se limita a la pantalla conversacional de
-`interfaces/web/agente/pantalla/app.html`. La landing y las vistas que sirven
-los MCP conservan su presentación y comportamiento actuales. Los archivos de
-fuentes se distribuyen localmente con sus licencias OFL.
+La pantalla conversacional vive en `interfaces/web/agente/pantalla/app.html`.
+La portada se adapta a la misma identidad según `landing-authkit.md`, con
+fundaciones compartidas en `src/base.css`. Las vistas que sirven los MCP
+conservan su presentación y comportamiento actuales. Los archivos de fuentes
+se distribuyen localmente con sus licencias OFL.
 
 El estado vacío explica cómo empezar; los ejemplos completan el campo sin
 enviar pedidos. Hay un único modo de PickAgent con Belo conectado; no hay

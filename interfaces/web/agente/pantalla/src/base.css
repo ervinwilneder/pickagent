@@ -1,0 +1,41 @@
+/* Fundaciones AuthKit compartidas por la portada y el chat. */
+@import "../../../../../shared/ui/dividers.css";
+@font-face { font-family: "Inter Variable"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("/fonts/inter-latin-wght-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk Variable"; font-style: normal; font-weight: 300 700; font-display: swap; src: url("/fonts/space-grotesk-latin-wght-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono Variable"; font-style: normal; font-weight: 100 800; font-display: swap; src: url("/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); }
+
+:root {
+  color-scheme: dark;
+  --fondo: #05060f;
+  --papel: #0d101b;
+  --tinta: #d1e4fa;
+  --tenue: #9da7ba;
+  --linea: #bad7f71f;
+  --linea-control: #bad7f738;
+  --hielo: #d8ecf8;
+  --violeta: #663af3;
+  --violeta-hover: #764ff6;
+  --foco: #b6d9fc;
+  --display: "Space Grotesk Variable", sans-serif;
+  --texto: "Inter Variable", sans-serif;
+  --mono: "JetBrains Mono Variable", monospace;
+  --sombra-vidrio: inset 0 1px 1px #c7d3ea1f, inset 0 24px 48px #c7d3ea06, 0 24px 32px #02030a33;
+}
+
+* { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: #3f4959 transparent; }
+[hidden] { display: none !important; }
+html, body { margin: 0; min-height: 100%; }
+body { background: var(--fondo); color: var(--tinta); font: 16.8px/1.5 var(--texto); -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 48% -12%, #7aa7db1c, transparent 60%); }
+::selection { background: #b6d9fc40; color: #fff; }
+input, textarea { caret-color: var(--tinta); }
+button, input, textarea { font: inherit; }
+button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
+button, a { touch-action: manipulation; }
+:focus-visible { outline: 3px solid var(--foco); outline-offset: 4px; }
+a { text-underline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.salto { position: fixed; top: 8px; left: 16px; z-index: 10; transform: translateY(-160%); padding: 10px 16px; border-radius: 6px; background: var(--hielo); color: var(--fondo); }
+.salto:focus { transform: none; }
+.pantalla { position: relative; height: 100dvh; max-width: 1360px; margin: 0 auto; display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; }
+

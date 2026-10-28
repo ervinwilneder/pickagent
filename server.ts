@@ -14,7 +14,7 @@ import path from "node:path";
 import { z } from "zod";
 import { belo, type BeloPort } from "./src/belo/index.ts";
 import { BeloError } from "./src/belo/port.ts";
-import { eventos, resumir } from "./src/eventos.ts";
+import { eventos, nuevosDesde, resumir, tipoMovimiento } from "./src/eventos.ts";
 import { deConversion, dePix, deTransferencia } from "./src/operacion.ts";
 
 const vista = (nombre: string) => fs.readFileSync(path.join(process.cwd(), "dist", `${nombre}.html`), "utf-8");
@@ -27,6 +27,7 @@ const UI = {
   operacion: `ui://belo/${VERSION}/operacion.html`,
   contactos: `ui://belo/${VERSION}/contactos.html`,
   depositar: `ui://belo/${VERSION}/depositar.html`,
+  novedades: `ui://belo/${VERSION}/novedades.html`,
 };
 
 /** Un error de belo se cuenta en términos del producto, nunca con su código. */
@@ -169,6 +170,27 @@ export function crearServer(cuenta: BeloPort = belo()) {
       }),
     }),
 
+    novedades: createTool({
+      id: "novedades",
+      description: "Deja una vista atenta a la cuenta de belo: cuando entra un movimiento nuevo (un depósito, una transferencia, una conversión, un pago por pix) lo muestra y avisa en la conversación. Usala cuando la persona quiera enterarse de lo que pasa sin preguntar.",
+      inputSchema: z.object({ tipo: tipoMovimiento.optional().describe("Solo avisar de movimientos de este tipo") }),
+      outputSchema: z.object({ resumen: z.string(), desde: z.string(), tipo: z.string().nullable(), demo: z.boolean() }),
+      mcp: { _meta: { ui: { resourceUri: UI.novedades } } },
+      execute: ({ tipo }) => intentar(async () => {
+        const desde = new Date().toISOString();
+        return { resumen: `Quedé atento a la cuenta desde ${desde}${tipo ? `, solo ${tipo}` : ""}. Cuando entre un movimiento, la vista lo va a contar en la conversación.`, desde, tipo: tipo ?? null, demo: Boolean(cuenta.simulacion) };
+      }),
+    }),
+
+    novedades_desde: createTool({
+      id: "novedades_desde",
+      description: "Movimientos posteriores a un instante, para la vista de novedades.",
+      inputSchema: z.object({ desde: z.string().datetime(), tipo: tipoMovimiento.optional() }),
+      outputSchema: z.object({ movimientos: z.array(z.any()), cursor: z.string() }),
+      mcp: { _meta: { ui: { visibility: ["app"] } } },
+      execute: ({ desde, tipo }) => intentar(() => nuevosDesde(cuenta, desde, tipo)),
+    }),
+
     simular_deposito: createTool({
       id: "simular_deposito",
       description: "Simula que entra un depósito en pesos a la cuenta (solo en la cuenta de demo).",
@@ -196,6 +218,7 @@ export function crearServer(cuenta: BeloPort = belo()) {
       [UI.operacion]: { name: "Operación para aprobar", description: "Una cotización con su vencimiento y la aprobación en belo", html: vista("operacion") },
       [UI.contactos]: { name: "Contactos", description: "La agenda de la cuenta", html: vista("contactos") },
       [UI.depositar]: { name: "Depositar", description: "CVU, alias y direcciones para fondear la cuenta", html: vista("depositar") },
+      [UI.novedades]: { name: "Novedades de la cuenta", description: "Avisa en la conversación cuando entra un movimiento", html: vista("novedades") },
     },
     events: eventos(cuenta),
   });

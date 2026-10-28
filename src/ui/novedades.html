@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Novedades de la cuenta</title>
+</head>
+<body>
+  <section class="panel" aria-label="Novedades de la cuenta">
+    <header class="cabecera"><span>belo_novedades</span><span class="estado" id="estado">iniciando</span></header>
+    <div class="cuerpo">
+      <p class="prompt" id="prompt">belo novedades --escuchar</p>
+      <div class="vence" id="latido"><span><span class="texto">esperando movimientos</span></span><div class="barra"><i></i></div></div>
+      <div class="seccion"><span>Movimientos desde que escucho</span><span id="cuantos">0</span></div>
+      <div class="filas" id="lista"><p class="nota">todavía nada. cuando entre algo, lo cuento acá y en el chat.</p></div>
+      <div class="acciones"><button class="boton" id="pausar" type="button">Pausar</button><button class="boton chico" id="simular" type="button" hidden>Simular un depósito</button></div>
+    </div>
+    <footer class="pie"><span>evento://<b>movimiento.nuevo</b></span><span>cada://<b>5s</b></span><span>avisa://<b>al_chat</b></span></footer>
+  </section>
+  <script type="module" src="./novedades.ts"></script>
+</body>
+</html>

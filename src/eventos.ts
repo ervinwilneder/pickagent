@@ -36,6 +36,13 @@ export function resumir(t: Transaccion): Movimiento {
   };
 }
 
+/** Movimientos posteriores al cursor (una fecha ISO), del más viejo al más nuevo. */
+export async function nuevosDesde(cuenta: BeloPort, cursor: string, tipo?: Movimiento["tipo"], max = 100): Promise<{ movimientos: Movimiento[]; cursor: string }> {
+  const { data } = await cuenta.transacciones({ from: cursor, type: tipo, limit: Math.min(max, 100) });
+  const nuevos = data.filter((t) => t.createdAt > cursor).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  return { movimientos: nuevos.map(resumir), cursor: nuevos.at(-1)?.createdAt ?? cursor };
+}
+
 export function eventos(cuenta: BeloPort) {
   return {
     "movimiento.nuevo": defineEvent({
@@ -47,11 +54,10 @@ export function eventos(cuenta: BeloPort) {
       async poll({ arguments: args, cursor, maxEvents }) {
         // Sin cursor: "desde ahora". No se reproduce historia vieja.
         if (!cursor) return { events: [], cursor: new Date().toISOString(), nextPollMs: 5_000 };
-        const { data } = await cuenta.transacciones({ from: cursor, type: args.tipo, limit: Math.min(maxEvents, 100) });
-        const nuevos = data.filter((t) => t.createdAt > cursor).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+        const { movimientos, cursor: siguiente } = await nuevosDesde(cuenta, cursor, args.tipo, maxEvents);
         return {
-          events: nuevos.map((t) => ({ eventId: t.id, timestamp: t.createdAt, data: resumir(t) })),
-          cursor: nuevos.at(-1)?.createdAt ?? cursor,
+          events: movimientos.map((m) => ({ eventId: m.id, timestamp: m.fecha, data: m })),
+          cursor: siguiente,
           nextPollMs: 5_000,
         };
       },

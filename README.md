@@ -9,6 +9,8 @@ entra el pago. Hecho en el Buildathon 001 de belo (Buenos Aires, 28 de octubre
 de 2026).
 
 Demo viva: **https://pickagent.vercel.app** (landing en `/`, app en `/app.html`).
+Cada push a `main` la despliega solo: el proyecto de Vercel está conectado a este
+repo con raíz en `interfaces/web/agente/pantalla`.
 
 ## Qué tiene de nuevo
 

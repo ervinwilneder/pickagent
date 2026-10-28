@@ -28,7 +28,7 @@ export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemp
     pedido_envio: createTool({
       id: "pedido_envio",
       description: "Abre el formulario de envío en el chat para que la persona complete o confirme los datos: origen, destino, hora límite, mercadería, peso, volumen, cuidados y contacto. Precargalo con todo lo que la persona ya dijo. Cuando lo confirma, la vista avisa en el chat con el id del pedido.",
-      inputSchema: datosDePedido.partial().describe("Lo que ya se sabe del envío"),
+      inputSchema: datosDePedido.partial().extend({ fragil: z.boolean().optional(), refrigerado: z.boolean().optional() }).describe("Lo que ya se sabe del envío"),
       outputSchema: z.object({ resumen: z.string(), borrador: z.any(), localidades: z.array(z.string()) }),
       mcp: { _meta: { ui: { resourceUri: UI.pedido } } },
       execute: async (borrador) => ({ resumen: "Formulario de envío abierto. Esperá a que la persona lo confirme; la vista avisa con el id del pedido.", borrador, localidades: localidades.map((l) => `${l.nombre}, ${l.provincia}`) }),

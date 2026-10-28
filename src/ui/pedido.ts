@@ -2,7 +2,7 @@
 import type { CallToolResult } from "@modelcontextprotocol/client";
 import { conectar, datos, esc, textoDeError } from "./comun.ts";
 
-interface Borrador { origen?: string; destino?: string; direccionOrigen?: string; direccionDestino?: string; fechaLimite?: string; mercaderia?: string; pesoKg?: number; volumenM3?: number; cuidados?: string[]; valorDeclarado?: number; contacto?: string; notas?: string }
+interface Borrador { origen?: string; destino?: string; direccionOrigen?: string; direccionDestino?: string; fechaLimite?: string; mercaderia?: string; pesoKg?: number; volumenM3?: number; cuidados?: string[]; fragil?: boolean; refrigerado?: boolean; valorDeclarado?: number; contacto?: string; notas?: string }
 
 const form = document.getElementById("form") as HTMLFormElement;
 const estadoEl = document.getElementById("estado")!;
@@ -35,8 +35,8 @@ function pintar(result: CallToolResult) {
   if (borrador.pesoKg) campo("pesoKg").value = String(borrador.pesoKg);
   if (borrador.volumenM3) campo("volumenM3").value = String(borrador.volumenM3);
   if (borrador.fechaLimite) campo("fechaLimite").value = aLocal(borrador.fechaLimite);
-  campo("fragil").checked = Boolean(borrador.cuidados?.includes("fragil"));
-  campo("refrigerado").checked = Boolean(borrador.cuidados?.includes("refrigerado"));
+  campo("fragil").checked = Boolean(borrador.cuidados?.includes("fragil") || borrador.fragil);
+  campo("refrigerado").checked = Boolean(borrador.cuidados?.includes("refrigerado") || borrador.refrigerado);
   const faltan = ["origen", "destino", "fechaLimite", "mercaderia", "pesoKg", "volumenM3", "contacto"].filter((k) => !campo(k).value);
   estadoEl.textContent = faltan.length ? `faltan ${faltan.length} datos` : "revisá y confirmá";
   (faltan[0] ? campo(faltan[0]) : boton).focus();

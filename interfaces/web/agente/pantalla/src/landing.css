@@ -61,13 +61,13 @@ h3 { font-size: 21px; line-height: 1.35; letter-spacing: -.02em; }
 .numero { display: block; margin-bottom: 8px; color: var(--tenue); font: 400 28px/1.2 var(--display); }
 .pasos p { color: var(--tenue); font-size: 16px; line-height: 1.75; }
 .pagos, .transportistas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 88px; }
-.ilustracion-pagos { display: block; width: min(100%, 560px); height: auto; margin-top: 12px; justify-self: center; }
+.ilustracion-seccion { display: block; width: min(100%, 560px); height: auto; margin-top: 12px; justify-self: center; }
 .beneficios { min-width: 0; }
 .beneficios > div { display: grid; gap: 10px; padding-block: 24px; border-top: 1px solid var(--linea); border-image: var(--divisor-horizontal) 1; }
 .beneficios > div:first-child { padding-top: 0; border-top: 0; }
 .beneficios dt { color: var(--hielo); font-size: 18px; font-weight: 500; }
 .beneficios dd { color: var(--tenue); font-size: 16px; line-height: 1.75; }
-.integraciones { display: grid; gap: 32px; min-width: 0; }
+.integraciones { display: grid; align-content: start; gap: 32px; min-width: 0; }
 .integraciones article { display: grid; gap: 12px; }
 .integraciones article + article { padding-top: 28px; border-top: 1px solid var(--linea); border-image: var(--divisor-horizontal) 1; }
 .integraciones article p { color: var(--tenue); font-size: 16px; line-height: 1.75; }

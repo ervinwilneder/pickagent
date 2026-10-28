@@ -54,6 +54,11 @@ escritorio. Se conserva completa, con su transparencia y proporción original,
 sin marco. En móvil queda entre la introducción y los beneficios, dentro del
 ancho disponible. Tiene descripción alternativa y carga diferida.
 
+La segunda ilustración provista por Lucas acompaña «¿Tenés una empresa de
+transporte?», debajo de la introducción. Comparte tamaño y comportamiento
+adaptable con la imagen de pagos, conserva la transparencia y se muestra
+completa. Su alternativa describe el catálogo de transporte y la conexión API.
+
 La entrega sigue la ruta de código acordada en este chat: commit en `main`.
 Los dominios publicados pertenecen a un equipo de Vercel que no está conectado
 a esta sesión; un push no confirma por sí solo que el sitio público cambió.

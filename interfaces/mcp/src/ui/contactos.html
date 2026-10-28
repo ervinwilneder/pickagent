@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Contactos</title>
+</head>
+<body>
+  <section class="panel" aria-label="Contactos">
+    <header class="cabecera"><span>belo_contactos</span><span class="estado" id="estado">cargando</span></header>
+    <div class="cuerpo">
+      <form class="entrada" id="buscador"><input id="buscar" type="search" placeholder="$ belo contactos --buscar nombre" autocomplete="off"><button class="boton" type="submit">Buscar ↵</button></form>
+      <div class="filas" id="lista"></div>
+    </div>
+    <footer class="pie"><span>contactos://<b>agenda</b></span><span>destino://<b>no_verificado</b></span></footer>
+  </section>
+  <script type="module" src="./contactos.ts"></script>
+</body>
+</html>

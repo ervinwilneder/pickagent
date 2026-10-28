@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Mi cuenta en belo</title>
+</head>
+<body>
+  <section class="panel" aria-label="Mi cuenta en belo">
+    <header class="cabecera"><span>belo_cuenta</span><span class="estado" id="estado">cargando</span></header>
+    <div class="cuerpo">
+      <p class="prompt" id="prompt">belo cuenta</p>
+      <div class="saldos" id="saldos"></div>
+      <div class="seccion"><span>Movimientos</span><span id="cuantos"></span></div>
+      <div class="filas" id="movimientos"></div>
+      <div class="acciones"><button class="boton chico" id="actualizar" type="button">Actualizar ↵</button></div>
+    </div>
+    <footer class="pie"><span>mcp://<b>connected</b></span><span>human://<b>in_control</b></span></footer>
+  </section>
+  <script type="module" src="./cuenta.ts"></script>
+</body>
+</html>

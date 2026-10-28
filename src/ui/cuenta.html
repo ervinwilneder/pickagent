@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Mi cuenta en belo</title>
+</head>
+<body>
+  <main class="cuenta">
+    <header class="cabecera">
+      <h1>Mi cuenta</h1>
+      <button id="actualizar" type="button">Actualizar</button>
+    </header>
+    <section class="saldos" id="saldos" aria-label="Saldos"></section>
+    <section class="movimientos" aria-label="Últimos movimientos">
+      <h2>Últimos movimientos</h2>
+      <ul id="movimientos"></ul>
+    </section>
+    <p class="estado" id="estado"></p>
+  </main>
+  <script type="module" src="./cuenta.ts"></script>
+</body>
+</html>

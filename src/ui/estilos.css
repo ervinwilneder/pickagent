@@ -1,0 +1,33 @@
+:root {
+  --fondo: var(--color-background-primary, #ffffff);
+  --texto: var(--color-text-primary, #16161a);
+  --tenue: var(--color-text-secondary, #6b6b76);
+  --borde: var(--color-border-primary, #e4e4ea);
+  --acento: #4f46e5;
+  --positivo: #15803d;
+  --negativo: #b91c1c;
+  font-family: var(--font-sans, system-ui, -apple-system, "Segoe UI", sans-serif);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --fondo: var(--color-background-primary, #121216); --texto: var(--color-text-primary, #f2f2f5); --tenue: var(--color-text-secondary, #a0a0ab); --borde: var(--color-border-primary, #2c2c34); --positivo: #4ade80; --negativo: #f87171; }
+}
+body { margin: 0; background: var(--fondo); color: var(--texto); }
+.cuenta { padding: 16px; max-width: 720px; }
+.cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 14px; color: var(--tenue); margin: 20px 0 8px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+button { border: 1px solid var(--borde); background: transparent; color: var(--texto); border-radius: 8px; padding: 6px 12px; cursor: pointer; font: inherit; }
+button:hover { border-color: var(--acento); }
+.saldos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+.saldo { border: 1px solid var(--borde); border-radius: 12px; padding: 12px; }
+.saldo .moneda { font-size: 12px; color: var(--tenue); }
+.saldo .monto { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; margin: 4px 0; }
+.saldo .rinde { font-size: 12px; color: var(--positivo); }
+ul { list-style: none; margin: 0; padding: 0; }
+li { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid var(--borde); }
+li .quien { font-weight: 500; }
+li .detalle { font-size: 12px; color: var(--tenue); grid-column: 1; }
+li .monto { font-variant-numeric: tabular-nums; text-align: right; }
+li .monto.entra { color: var(--positivo); }
+li .monto.sale { color: var(--negativo); }
+.estado { font-size: 12px; color: var(--tenue); min-height: 1em; }

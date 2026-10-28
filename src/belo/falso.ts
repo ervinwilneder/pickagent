@@ -49,7 +49,19 @@ export function beloFalso(): BeloPort {
   function confirmar(id: string): Confirmacion {
     const t = pendientes.get(id);
     if (!t) throw new BeloError("not_found", "validation_error", "Quote not found or expired");
-    // Con una persona conectada belo devolvería un link de aprobación; el falso lo simula.
+    // Con una persona conectada belo devolvería un link de aprobación; el falso lo simula
+    // y, a los pocos segundos, da la operación por aprobada: queda en el historial y
+    // los saldos se mueven, como si la persona hubiera aprobado en belo.
+    setTimeout(() => {
+      if (t.status !== "pending") return;
+      t.status = "success";
+      t.updatedAt = new Date().toISOString();
+      for (const d of t.receipt?.debits ?? []) {
+        const s = saldos.find((x) => x.currencyCode === (d.currency === "ARS" ? "ARGt" : d.currency));
+        if (s) s.available = (Number(s.available) - Number(d.amount)).toFixed(s.decimals);
+      }
+      transacciones.unshift(t);
+    }, 4_000);
     return { id, status: "pending", approvalUrl: `https://belo.app/aprobar/${id}` };
   }
 

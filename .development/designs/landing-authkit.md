@@ -43,6 +43,9 @@ ejemplo. La confirmación usa verde de éxito en el ícono y el mensaje, con el
 seguimiento debajo. Los importes, el orden del pago y el contenido restante
 conservan su significado.
 
+El precio principal y su moneda usan el violeta de marca en una variante
+clara para texto sobre fondo oscuro, con contraste suficiente también en ARS.
+
 La entrega sigue la ruta de código acordada en este chat: commit en `main`.
 Los dominios publicados pertenecen a un equipo de Vercel que no está conectado
 a esta sesión; un push no confirma por sí solo que el sitio público cambió.

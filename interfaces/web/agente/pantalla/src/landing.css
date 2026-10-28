@@ -40,7 +40,7 @@ h3 { font-size: 21px; line-height: 1.35; letter-spacing: -.02em; }
 .oferta-cabecera, .oferta-precio { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
 .quien { font-size: 15px; font-weight: 500; color: var(--hielo); }
 .oferta-precio { margin-top: 12px; }
-.oferta-precio strong { color: var(--hielo); font: 500 36px/1.2 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.oferta-precio strong { color: var(--violeta-texto); font: 500 36px/1.2 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
 .oferta-precio small { font: 400 13px/1.5 var(--texto); letter-spacing: normal; }
 .oferta-precio s { color: var(--tenue); font-size: 14.4px; font-variant-numeric: tabular-nums; }
 .detalle { margin-top: 14px; color: var(--tenue); font-size: 12.5px; line-height: 1.7; }

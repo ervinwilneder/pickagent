@@ -7,9 +7,10 @@ import { buildAllowAttribute, type McpUiSandboxProxyReadyNotification, type McpU
 
 if (window.self === window.top) throw new Error("Este archivo solo corre dentro de un iframe.");
 if (!document.referrer) throw new Error("Sin referrer: no se puede validar quién embebe.");
-if (!/^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(document.referrer)) throw new Error(`Origen no permitido: ${document.referrer}`);
-
 const ORIGEN_PANTALLA = new URL(document.referrer).origin;
+// Quién puede embeber el sandbox: la pantalla local, o la publicada (VITE_PANTALLA_ORIGEN).
+const permitidos = [/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/, ...String(import.meta.env.VITE_PANTALLA_ORIGEN ?? "").split(",").filter(Boolean).map((o) => new RegExp(`^${o.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`))];
+if (!permitidos.some((re) => re.test(ORIGEN_PANTALLA))) throw new Error(`Origen no permitido: ${ORIGEN_PANTALLA}`);
 const ORIGEN_PROPIO = new URL(window.location.href).origin;
 
 // Si window.top fuera accesible, el sandbox estaría mal configurado.

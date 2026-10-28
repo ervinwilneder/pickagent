@@ -8,8 +8,13 @@ import { Client, StreamableHTTPClientTransport, type CallToolResult, type Resour
 
 const IMPLEMENTACION = { name: "belo agente", version: "0.0.0" };
 
-/** El sandbox vive en otro origen: 127.0.0.1 contra localhost de la pantalla (o al revés). */
+/**
+ * El sandbox vive en otro origen que la pantalla. En local, 127.0.0.1 contra
+ * localhost (o al revés); publicada, el dominio que diga VITE_SANDBOX_URL.
+ */
 export function urlDelSandbox(): URL {
+  const configurada = import.meta.env.VITE_SANDBOX_URL as string | undefined;
+  if (configurada) return new URL(configurada);
   const u = new URL(window.location.href);
   u.hostname = u.hostname === "localhost" ? "127.0.0.1" : "localhost";
   u.pathname = "/sandbox.html";

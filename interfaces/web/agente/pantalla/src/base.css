@@ -18,18 +18,52 @@
   --violeta-texto: #a58aff;
   --foco: #b6d9fc;
   --exito: #8ee5b3;
+  --texto-suave: #c7d3ea;
+  --sobre-violeta: #fff;
+  --vidrio: #bad6f708;
+  --vidrio-fuerte: #bad6f714;
+  --vidrio-hover: #bad6f712;
+  --vidrio-barra: #bad6f703;
+  --linea-fuerte: #bad7f766;
+  --bruma: #7aa7db1c;
+  --scroll: #3f4959;
   --display: "Space Grotesk Variable", sans-serif;
   --texto: "Inter Variable", sans-serif;
   --mono: "JetBrains Mono Variable", monospace;
   --sombra-vidrio: inset 0 1px 1px #c7d3ea1f, inset 0 24px 48px #c7d3ea06, 0 24px 32px #02030a33;
 }
 
-* { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: #3f4959 transparent; }
+html[data-tema="claro"] {
+  color-scheme: light;
+  --fondo: #f4f7fb;
+  --papel: #ffffff;
+  --tinta: #243044;
+  --tenue: #5c6b80;
+  --linea: #1620331a;
+  --linea-control: #1620332b;
+  --hielo: #141a26;
+  --violeta: #663af3;
+  --violeta-hover: #5426dc;
+  --violeta-texto: #5a2de0;
+  --foco: #663af3;
+  --exito: #0c7a42;
+  --texto-suave: #3c4d66;
+  --vidrio: #1620330a;
+  --vidrio-fuerte: #16203312;
+  --vidrio-hover: #16203316;
+  --vidrio-barra: #16203308;
+  --linea-fuerte: #16203355;
+  --bruma: #663af318;
+  --scroll: #c5ceda;
+  --sombra-vidrio: inset 0 1px 0 #fff, 0 18px 40px #16203314;
+}
+
+* { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--scroll) transparent; }
 [hidden] { display: none !important; }
 html, body { margin: 0; min-height: 100%; }
 body { background: var(--fondo); color: var(--tinta); font: 16.8px/1.5 var(--texto); -webkit-font-smoothing: antialiased; }
-body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 48% -12%, #7aa7db1c, transparent 60%); }
-::selection { background: #b6d9fc40; color: #fff; }
+body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 48% -12%, var(--bruma), transparent 60%); }
+::selection { background: var(--violeta); color: #fff; }
 input, textarea { caret-color: var(--tinta); }
 button, input, textarea { font: inherit; }
 button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
@@ -40,4 +74,13 @@ a { text-underline-offset: 4px; }
 .salto { position: fixed; top: 8px; left: 16px; z-index: 10; transform: translateY(-160%); padding: 10px 16px; border-radius: 6px; background: var(--hielo); color: var(--fondo); }
 .salto:focus { transform: none; }
 .pantalla { position: relative; height: 100dvh; max-width: 1360px; margin: 0 auto; display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; }
+
+.tema { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--linea-control); border-radius: 999px; }
+.boton-tema { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--tenue); cursor: pointer; }
+.boton-tema svg { width: 18px; height: 18px; display: block; }
+.boton-tema[aria-pressed="true"] { background: var(--vidrio-fuerte); color: var(--hielo); }
+
+/* Esfera del puntero: el blanco con difference invierte el color de debajo. */
+.cursor-esfera { position: fixed; top: 0; left: 0; z-index: 9999; width: 100px; height: 100px; margin-left: -50px; margin-top: -50px; border: 1.5px solid #fff; border-radius: 50px; background: #fff; mix-blend-mode: difference; pointer-events: none; opacity: 0; will-change: transform; transition: border-radius 280ms cubic-bezier(.44, 0, .56, 1), background-color 280ms cubic-bezier(.44, 0, .56, 1), opacity 280ms cubic-bezier(.44, 0, .56, 1); }
+@media (prefers-reduced-motion: reduce) { .cursor-esfera { transition: none; } }
 

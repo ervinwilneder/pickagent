@@ -5,99 +5,152 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#05060f">
+  <script>
+    try {
+      if (localStorage.getItem("pickagent-tema") === "claro") {
+        document.documentElement.dataset.tema = "claro";
+        document.documentElement.style.colorScheme = "light";
+      }
+    } catch (e) {}
+  </script>
   <title>pickagent · tu próximo envío empieza con un mensaje</title>
   <meta name="description" content="Contá qué querés mandar. Compará transportistas, elegí tu envío y aprobá el pago con belo desde una misma conversación.">
   <link rel="stylesheet" href="/src/landing.css">
 </head>
 <body>
-  <a class="salto" href="#contenido">Ir al contenido</a>
+  <a class="salto" href="#contenido" data-t="salto">Ir al contenido</a>
   <div class="sitio">
     <header class="ancho barra">
-      <a class="marca" href="/" aria-label="pickagent, inicio">pickagent</a>
-      <nav aria-label="Navegación principal">
-        <a class="enlace-seccion" href="#como">Cómo funciona</a>
-        <a class="enlace-seccion" href="#transportistas">Transportistas</a>
-        <a class="enlace-seccion" href="#belo">Pagos</a>
-        <a class="boton primario" href="/app.html">Probar pickagent <span data-icono="arrow-up-right" aria-hidden="true"></span></a>
+      <a class="marca" href="/" data-t-aria="marcaAria" aria-label="pickagent, inicio">pickagent</a>
+      <nav data-t-aria="nav" aria-label="Navegación principal">
+        <a class="enlace-seccion" href="#como" data-t="como">Cómo funciona</a>
+        <a class="enlace-seccion" href="#transportistas" data-t="transportistas">Transportistas</a>
+        <a class="enlace-seccion" href="#belo" data-t="pagos">Pagos</a>
+        <div class="tema" role="group" data-t-aria="temaGrupo" aria-label="Tema">
+          <button type="button" class="boton-tema" data-tema-opcion="oscuro" aria-pressed="true" data-t-aria="temaOscuro" aria-label="Tema oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14.6 3.1a8.4 8.4 0 1 0 6.4 13.4A7.2 7.2 0 0 1 14.6 3.1Z"/></svg></button>
+          <button type="button" class="boton-tema" data-tema-opcion="claro" aria-pressed="false" data-t-aria="temaClaro" aria-label="Tema claro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6" fill="currentColor"/><path d="M12 2.4v2.3M12 19.3v2.3M2.4 12h2.3M19.3 12h2.3M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+        </div>
+        <a class="boton primario" href="/app.html"><span data-t="probar">Probar pickagent</span> <span data-icono="arrow-up-right" aria-hidden="true"></span></a>
       </nav>
     </header>
 
     <main id="contenido" tabindex="-1">
       <section class="ancho hero" aria-labelledby="titulo-principal">
         <div class="texto">
-          <h1 id="titulo-principal">Decile qué mandar.<span>pickagent lo resuelve.</span></h1>
-          <p class="bajada">Compará opciones de transporte, elegí tu envío y aprobá el pago con belo. Todo desde una conversación.</p>
+          <h1 id="titulo-principal"><span data-t="hero1">Decile qué mandar.</span><span data-t="hero2">pickagent lo resuelve.</span></h1>
+          <p class="bajada" data-t="bajada">Compará opciones de transporte, elegí tu envío y aprobá el pago con belo. Todo desde una conversación.</p>
           <div class="acciones">
-            <a class="boton primario" href="/app.html">Probar pickagent <span data-icono="arrow-up-right" aria-hidden="true"></span></a>
-            <a class="enlace-texto" href="#como">Ver cómo funciona <span data-icono="arrow-right" aria-hidden="true"></span></a>
+            <a class="boton primario" href="/app.html"><span data-t="probar">Probar pickagent</span> <span data-icono="arrow-up-right" aria-hidden="true"></span></a>
+            <a class="enlace-texto" href="#como"><span data-t="verComo">Ver cómo funciona</span> <span data-icono="arrow-right" aria-hidden="true"></span></a>
           </div>
         </div>
 
         <figure class="muestra" aria-labelledby="ejemplo-titulo">
-          <figcaption class="cabecera"><span id="ejemplo-titulo">pickagent</span><span class="meta">Ejemplo de envío</span></figcaption>
+          <figcaption class="cabecera"><span id="ejemplo-titulo">pickagent</span><span class="meta" data-t="ejemplo">Ejemplo de envío</span></figcaption>
           <div class="conversacion">
-            <p class="burbuja vos">Tengo que mandar 20 cajas de repuestos, 120 kg, de Villa Crespo a Rosario. Es frágil.</p>
+            <p class="burbuja vos" data-t="burbujaVos">Tengo que mandar 20 cajas de repuestos, 120 kg, de Villa Crespo a Rosario. Es frágil.</p>
+            <p class="burbuja agente" data-t="burbujaAgente">Esta es la mejor opción pagando con belo:</p>
             <div class="oferta">
-              <div class="oferta-cabecera"><span class="quien">Ruta Pampa</span></div>
+              <div class="oferta-cabecera"><span class="quien">Ruta Pampa</span><span class="etiqueta" data-t="precioBelo">Precio con belo</span></div>
               <div class="oferta-precio"><strong>$ 206.131 <small>ARS</small></strong><s>$ 234.240</s></div>
-              <p class="detalle">Retira jueves de 9 a 12 · entrega viernes antes de las 10 · acepta carga frágil.</p>
-              <p class="ahorro">Ahorrás $ 28.109 con belo.</p>
+              <p class="detalle" data-t="detalle">Retira jueves de 9 a 12 · entrega viernes antes de las 10 · acepta carga frágil.</p>
+              <p class="ahorro" data-t="ahorro">Ahorrás $ 28.109 con belo.</p>
             </div>
-            <p class="burbuja agente">¿Reservo y te paso la aprobación?</p>
-            <p class="burbuja vos">Dale. Ya aprobé el pago en belo.</p>
-            <div class="evento"><span data-icono="check-circle" aria-hidden="true"></span><div><strong>Tu envío está confirmado.</strong><span>Seguimiento <code>RP-88213</code></span></div></div>
+            <p class="burbuja agente" data-t="reservo">¿Reservo y te paso la aprobación?</p>
+            <p class="burbuja vos breve" data-t="dale">Dale. Ya aprobé el pago en belo.</p>
+            <div class="evento"><span data-icono="check-circle" aria-hidden="true"></span><div><strong data-t="confirmado">Tu envío está confirmado.</strong><span><span data-t="seguimiento">Seguimiento</span> <code>RP-88213</code></span></div></div>
           </div>
         </figure>
       </section>
 
       <section class="ancho seccion" id="como" aria-labelledby="titulo-como">
         <div class="encabezado">
-          <h2 id="titulo-como">Cómo funciona un envío</h2>
-          <p>De lo que tenés que mandar al seguimiento, sin salir de la conversación.</p>
+          <h2 id="titulo-como" data-t="tituloComo">Cómo funciona un envío</h2>
+          <p data-t="bajadaComo">De lo que tenés que mandar al seguimiento, sin salir de la conversación.</p>
         </div>
         <ol class="pasos">
-          <li><span class="numero" aria-hidden="true">1</span><h3>Contás el envío</h3><p>Qué mandás, de dónde a dónde y para cuándo. Completás los datos que falten.</p></li>
-          <li><span class="numero" aria-hidden="true">2</span><h3>Comparás opciones</h3><p>Ves hasta cinco ofertas, con retiro, entrega y precio pagando con belo.</p></li>
-          <li><span class="numero" aria-hidden="true">3</span><h3>Elegís y aprobás</h3><p>Aprobás el pago en belo o elegís contra entrega con belo air cuando esté disponible.</p></li>
-          <li><span class="numero" aria-hidden="true">4</span><h3>Recibís el seguimiento</h3><p>Cuando entra el pago, pickagent confirma la reserva y te da el código de seguimiento.</p></li>
+          <li><span class="numero" aria-hidden="true">1</span><h3 data-t="paso1">Contás el envío</h3><p data-t="paso1p">Qué mandás, de dónde a dónde y para cuándo. Completás los datos que falten.</p></li>
+          <li><span class="numero" aria-hidden="true">2</span><h3 data-t="paso2">Comparás opciones</h3><p data-t="paso2p">Ves hasta cinco ofertas, con retiro, entrega y precio pagando con belo.</p></li>
+          <li><span class="numero" aria-hidden="true">3</span><h3 data-t="paso3">Elegís y aprobás</h3><p data-t="paso3p">Aprobás el pago en belo o elegís contra entrega con belo air cuando esté disponible.</p></li>
+          <li><span class="numero" aria-hidden="true">4</span><h3 data-t="paso4">Recibís el seguimiento</h3><p data-t="paso4p">Cuando entra el pago, pickagent confirma la reserva y te da el código de seguimiento.</p></li>
         </ol>
       </section>
 
       <section class="ancho seccion pagos" id="belo" aria-labelledby="titulo-belo">
         <div class="encabezado">
-          <h2 id="titulo-belo">El envío y el pago,<br>en el mismo lugar.</h2>
-          <p>Revisás las condiciones y aprobás el importe. pickagent se ocupa de confirmar el envío cuando llega el pago.</p>
-          <img class="ilustracion-seccion" src="/images/envios-y-pagos.png" width="1536" height="1024" alt="Pago de un envío confirmado en un teléfono, junto a una caja y un camión." loading="lazy" decoding="async">
+          <h2 id="titulo-belo"><span data-t="pago1">El envío y el pago,</span><br><span data-t="pago2">en el mismo lugar.</span></h2>
+          <p data-t="pagoBajada">Revisás las condiciones y aprobás el importe. pickagent se ocupa de confirmar el envío cuando llega el pago.</p>
+          <img class="ilustracion-seccion" src="/images/envios-y-pagos.png" width="1536" height="1024" data-t-alt="ilustrPagos" alt="Pago de un envío confirmado en un teléfono, junto a una caja y un camión." loading="lazy" decoding="async">
         </div>
         <dl class="beneficios">
-          <div><dt>Precio con belo</dt><dd>Ves el precio de lista, el precio con belo y cuánto ahorrás antes de elegir.</dd></div>
-          <div><dt>El pago lo aprobás vos</dt><dd>El importe y el destinatario ya están preparados. Revisás y confirmás desde belo.</dd></div>
-          <div><dt>Confirmación automática</dt><dd>Cuando entra el pago, tu reserva se confirma y recibís el seguimiento.</dd></div>
-          <div><dt>Contra entrega con belo air</dt><dd>Si la oferta lo admite, pagás acercando tu teléfono al del chofer. Revisás el monto y aprobás, sin efectivo.</dd></div>
+          <div><dt data-t="ben1">Precio con belo</dt><dd data-t="ben1p">Ves el precio de lista, el precio con belo y cuánto ahorrás antes de elegir.</dd></div>
+          <div><dt data-t="ben2">El pago lo aprobás vos</dt><dd data-t="ben2p">El importe y el destinatario ya están preparados. Revisás y confirmás desde belo.</dd></div>
+          <div><dt data-t="ben3">Confirmación automática</dt><dd data-t="ben3p">Cuando entra el pago, tu reserva se confirma y recibís el seguimiento.</dd></div>
+          <div><dt data-t="ben4">Contra entrega con belo air</dt><dd data-t="ben4p">Si la oferta lo admite, pagás acercando tu teléfono al del chofer. Revisás el monto y aprobás, sin efectivo.</dd></div>
         </dl>
       </section>
 
       <section class="ancho seccion transportistas" id="transportistas" aria-labelledby="titulo-transportistas">
         <div class="encabezado">
-          <h2 id="titulo-transportistas">¿Tenés una empresa<br>de transporte?</h2>
-          <p>Sumá tus servicios al motor de pickagent. Podés hacerlo con tu catálogo o con tu propia API.</p>
-          <img class="ilustracion-seccion" src="/images/transportistas.png" width="1536" height="1024" alt="Catálogo de servicios de transporte conectado por API, con un camión y paquetes." loading="lazy" decoding="async">
+          <h2 id="titulo-transportistas"><span data-t="trans1">¿Tenés una empresa</span><br><span data-t="trans2">de transporte?</span></h2>
+          <p data-t="transBajada">Sumá tus servicios al motor de pickagent. Podés hacerlo con tu catálogo o con tu propia API.</p>
+          <img class="ilustracion-seccion" src="/images/transportistas.png" width="1536" height="1024" data-t-alt="ilustrTrans" alt="Catálogo de servicios de transporte conectado por API, con un camión y paquetes." loading="lazy" decoding="async">
         </div>
         <div class="integraciones">
-          <article><h3>Con tu catálogo</h3><p>Definís vehículos, cobertura, tarifas, capacidad y horarios de retiro. pickagent cotiza tus servicios.</p></article>
-          <article><h3>Con tu API</h3><p>Conectás cotización, creación de envíos y seguimiento. El motor consulta tu disponibilidad y tus precios.</p></article>
-          <p class="liquidacion">El cliente le paga a pickagent. Después, pickagent liquida al transportista lo cobrado menos su comisión, desde su cuenta de belo.</p>
+          <article><h3 data-t="cat">Con tu catálogo</h3><p data-t="catp">Definís vehículos, cobertura, tarifas, capacidad y horarios de retiro. pickagent cotiza tus servicios.</p></article>
+          <article><h3 data-t="api">Con tu API</h3><p data-t="apip">Conectás cotización, creación de envíos y seguimiento. El motor consulta tu disponibilidad y tus precios.</p></article>
+          <p class="liquidacion" data-t="liquidacion">El cliente le paga a pickagent. Después, pickagent liquida al transportista lo cobrado menos su comisión, desde su cuenta de belo.</p>
         </div>
       </section>
 
       <section class="ancho seccion cierre" aria-labelledby="titulo-cierre">
-        <h2 id="titulo-cierre">Tu próximo envío empieza<br>con un mensaje.</h2>
-        <p>Contá qué querés mandar. pickagent te ayuda a encontrar cómo llevarlo.</p>
-        <a class="boton primario" href="/app.html">Probar pickagent <span data-icono="arrow-up-right" aria-hidden="true"></span></a>
+        <h2 id="titulo-cierre"><span data-t="cierre1">Tu próximo envío empieza</span><br><span data-t="cierre2">con un mensaje.</span></h2>
+        <p data-t="cierreBajada">Contá qué querés mandar. pickagent te ayuda a encontrar cómo llevarlo.</p>
+        <a class="boton primario" href="/app.html"><span data-t="probar">Probar pickagent</span> <span data-icono="arrow-up-right" aria-hidden="true"></span></a>
       </section>
     </main>
 
-    <footer class="ancho pie-landing"><a class="marca" href="/">pickagent</a><p>Envíos y pagos con belo.</p><a class="enlace-texto" href="#como">Cómo funciona</a></footer>
+    <footer class="ancho pie-landing">
+      <div class="pie-fila">
+        <a class="marca" href="/" data-t-aria="marcaAria" aria-label="pickagent, inicio">pickagent</a>
+        <p class="pie-leyenda" data-t="pie">Envíos y pagos con belo.</p>
+        <a class="enlace-texto" href="#como" data-t="como">Cómo funciona</a>
+      </div>
+      <div class="pie-grupos">
+        <div class="pie-grupo">
+          <p class="pie-etiqueta" data-t="seguinos">Seguinos</p>
+          <div class="pie-iconos">
+            <button type="button" class="boton-icono" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.2" cy="6.9" r="0.9" fill="currentColor"/></svg></button>
+            <button type="button" class="boton-icono" aria-label="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><text x="12" y="16" text-anchor="middle" fill="currentColor" font-size="12" font-weight="700" font-family="Inter, sans-serif">in</text></svg></button>
+            <button type="button" class="boton-icono" aria-label="X"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 6.2l11.6 11.6M17.8 6.2L6.2 17.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+          </div>
+        </div>
+        <div class="pie-grupo">
+          <p class="pie-etiqueta" data-t="preguntales">Preguntale a la IA</p>
+          <div class="pie-iconos">
+            <a class="boton-icono" data-ia="chatgpt" data-t-aria="ariaChatgpt" href="https://chatgpt.com/?q=%C2%BFQu%C3%A9%20es%20pickagent%20y%20c%C3%B3mo%20resuelve%20un%20env%C3%ADo%20pagando%20con%20belo%3F%20Contame%20qu%C3%A9%20ofrece." target="_blank" rel="noopener noreferrer" aria-label="Preguntarle a ChatGPT sobre pickagent"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.4c.8 0 1.5.4 1.8 1.1l.5 1.1 1.2-.4a2.1 2.1 0 0 1 2.6 2.6l-.4 1.2 1.1.5a2.1 2.1 0 0 1 0 3.6l-1.1.5.4 1.2a2.1 2.1 0 0 1-2.6 2.6l-1.2-.4-.5 1.1a2.1 2.1 0 0 1-3.6 0l-.5-1.1-1.2.4a2.1 2.1 0 0 1-2.6-2.6l.4-1.2-1.1-.5a2.1 2.1 0 0 1 0-3.6l1.1-.5-.4-1.2a2.1 2.1 0 0 1 2.6-2.6l1.2.4.5-1.1A2.1 2.1 0 0 1 12 2.4Zm0 5.2a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8Z"/></svg></a>
+            <a class="boton-icono" data-ia="claude" data-t-aria="ariaClaude" href="https://claude.ai/new?q=%C2%BFQu%C3%A9%20es%20pickagent%20y%20c%C3%B3mo%20resuelve%20un%20env%C3%ADo%20pagando%20con%20belo%3F%20Contame%20qu%C3%A9%20ofrece." target="_blank" rel="noopener noreferrer" aria-label="Preguntarle a Claude sobre pickagent"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2l1.1 5.8 4.6-3.8-2.2 5.5 5.8.2-4.7 3.4 4.4 3.8-5.7.7 1.6 5.6-4.9-3.2L12 22.2l-1.6-5.8-4.9 3.2 1.6-5.6-5.7-.7 4.4-3.8L5.1 10l5.8-.2L8.7 4.2l4.6 3.8L12 2.2Z"/></svg></a>
+            <a class="boton-icono" data-ia="gemini" data-t-aria="ariaGemini" href="https://www.google.com/search?udm=50&q=%C2%BFQu%C3%A9%20es%20pickagent%20y%20c%C3%B3mo%20resuelve%20un%20env%C3%ADo%20pagando%20con%20belo%3F%20Contame%20qu%C3%A9%20ofrece." target="_blank" rel="noopener noreferrer" aria-label="Preguntarle a Gemini sobre pickagent"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 1.8c.5 5 2 7.6 5.4 9.4C14 13.2 12.6 16.4 12 22.2c-.6-5.8-2-9-5.4-11C10 9.4 11.5 6.8 12 1.8Z"/></svg></a>
+            <a class="boton-icono" data-ia="perplexity" data-t-aria="ariaPerplexity" href="https://www.perplexity.ai/search?q=%C2%BFQu%C3%A9%20es%20pickagent%20y%20c%C3%B3mo%20resuelve%20un%20env%C3%ADo%20pagando%20con%20belo%3F%20Contame%20qu%C3%A9%20ofrece." target="_blank" rel="noopener noreferrer" aria-label="Preguntarle a Perplexity sobre pickagent"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 1.6l1.6 6.4 5.2-4.1-2.4 6.2 6.6-.4-5.2 4.1 5.2 4.1-6.6-.4 2.4 6.2-5.2-4.1L12 22.4l-1.6-6.4-5.2 4.1 2.4-6.2-6.6.4 5.2-4.1L1 9.7l6.6.4L5.2 3.9l5.2 4.1L12 1.6Z"/></svg></a>
+          </div>
+        </div>
+        <div class="pie-grupo">
+          <p class="pie-etiqueta" data-t="etiquetaIdioma">Idioma</p>
+          <div class="idioma">
+            <button type="button" id="boton-idioma" class="boton-idioma" aria-haspopup="listbox" aria-expanded="false" aria-controls="lista-idioma" aria-label="Cambiar idioma. Actual: Español (Argentina)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 3c2.4 2.4 3.6 5.4 3.6 9s-1.2 6.6-3.6 9c-2.4-2.4-3.6-5.4-3.6-9s1.2-6.6 3.6-9Z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              <span id="idioma-nombre" class="idioma-nombre">Español</span>
+              <span id="idioma-region" class="idioma-region">Argentina</span>
+            </button>
+            <ul id="lista-idioma" class="idioma-lista" role="listbox" aria-label="Seleccioná el idioma" hidden>
+              <li><button type="button" role="option" data-idioma="es-AR" aria-selected="true"><span class="idioma-nombre">Español</span> <span class="idioma-region">Argentina</span></button></li>
+              <li><button type="button" role="option" data-idioma="es-419" aria-selected="false"><span class="idioma-nombre">Español</span> <span class="idioma-region">Latinoamérica</span></button></li>
+              <li><button type="button" role="option" data-idioma="en" aria-selected="false"><span class="idioma-nombre">English</span></button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
   <script type="module" src="/src/landing.ts"></script>
 </body>

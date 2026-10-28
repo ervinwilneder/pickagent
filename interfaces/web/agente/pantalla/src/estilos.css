@@ -2,7 +2,8 @@
 @import "./base.css";
 
 /* Encabezado del modo único de PickAgent. */
-.barra { display: flex; align-items: center; gap: 24px; padding: 24px 36px; border-bottom: 1px solid var(--linea); background: #bad6f703; }
+.barra { display: flex; align-items: center; gap: 24px; padding: 24px 36px; border-bottom: 1px solid var(--linea); background: var(--vidrio-barra); }
+.barra .tema { margin-left: auto; }
 .marca-belo { color: var(--hielo); font: 500 30px/1.2 var(--display); letter-spacing: -.035em; text-decoration: none; }
 
 /* El hilo ofrece una guía cuando todavía no hay mensajes. */
@@ -12,40 +13,40 @@
 h1 { margin: 0; font: 500 clamp(38.4px, 4.56vw, 55.2px)/1.16 var(--display); letter-spacing: -.035em; color: var(--hielo); text-wrap: balance; }
 .bienvenida > p { margin: 18px auto 32px; max-width: 54ch; color: var(--tenue); font-size: 18px; line-height: 1.8; }
 .ejemplos { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.ejemplos button { display: flex; align-items: center; justify-content: center; gap: 18px; min-height: 48px; border: 1px solid var(--linea-control); border-radius: 999px; padding: 12px 18px; background: #bad6f708; color: var(--tinta); cursor: pointer; font-size: 14.4px; transition: background 160ms, border-color 160ms; }
-.ejemplos button:hover { background: #bad6f712; border-color: #bad7f766; }
+.ejemplos button { display: flex; align-items: center; justify-content: center; gap: 18px; min-height: 48px; border: 1px solid var(--linea-control); border-radius: 999px; padding: 12px 18px; background: var(--vidrio); color: var(--tinta); cursor: pointer; font-size: 14.4px; transition: background 160ms, border-color 160ms; }
+.ejemplos button:hover { background: var(--vidrio-hover); border-color: var(--linea-fuerte); }
 .ejemplos button span { color: var(--tenue); }
-.mensaje { min-width: 0; max-width: 90%; border: 1px solid var(--linea); border-radius: 16px; background: #bad6f708; box-shadow: var(--sombra-vidrio); overflow-wrap: anywhere; }
-.mensaje.persona { justify-self: end; background: #bad6f714; }
+.mensaje { min-width: 0; max-width: 90%; border: 1px solid var(--linea); border-radius: 16px; background: var(--vidrio); box-shadow: var(--sombra-vidrio); overflow-wrap: anywhere; }
+.mensaje.persona { justify-self: end; background: var(--vidrio-fuerte); }
 .mensaje.agente { justify-self: start; }
 .mensaje.evento { justify-self: stretch; max-width: 100%; border-style: dashed; border-radius: 6px; background: transparent; box-shadow: none; }
 .mensaje header { display: flex; justify-content: space-between; gap: 24px; padding: 14px 20px 0; color: var(--tenue); font-size: 13.2px; }
-.mensaje .rol { font-weight: 500; color: #c7d3ea; }
+.mensaje .rol { font-weight: 500; color: var(--texto-suave); }
 .cuando { font-variant-numeric: tabular-nums; }
 .contenido { display: grid; gap: 12px; padding: 10px 20px 20px; }
 .contenido p { margin: 0; max-width: 72ch; font-size: 16.8px; line-height: 1.75; white-space: pre-wrap; }
 .contenido code { font: 13.2px/1.7 var(--mono); }
 .llamada { font-size: 14.4px; color: var(--tenue); }
 .llamada[data-estado]::after { content: " · " attr(data-estado); }
-.marca { color: #c7d3ea; }
+.marca { color: var(--texto-suave); }
 .marca.ok, .marca.mal, .contenido p.mal { color: var(--hielo); }
 .marco-vista { min-height: 80px; border: 1px solid var(--linea); border-radius: 12px; overflow: hidden; background: var(--papel); }
 .marco-vista iframe.vista { display: block; width: 100%; height: 320px; border: 0; background: transparent; }
 
 /* Composer: una única acción primaria violeta, como en el front de referencia. */
 .zona-composer { width: min(100%, 888px); justify-self: center; padding: 16px 24px 32px; }
-.composer { display: flex; align-items: flex-end; min-height: 132px; gap: 12px; padding: 10px 10px 10px 20px; border: 1px solid var(--linea-control); border-radius: 16px; background: #bad6f708; box-shadow: var(--sombra-vidrio); backdrop-filter: blur(20px); }
+.composer { display: flex; align-items: flex-end; min-height: 132px; gap: 12px; padding: 10px 10px 10px 20px; border: 1px solid var(--linea-control); border-radius: 16px; background: var(--vidrio); box-shadow: var(--sombra-vidrio); backdrop-filter: blur(20px); }
 .composer:focus-within { border-color: var(--foco); }
-.composer textarea { flex: 1; min-width: 0; height: 110px; padding: 8px 0; border: 0; border-radius: 6px; resize: none; background: transparent; color: #fff; font-size: 16.8px; line-height: 1.6; }
+.composer textarea { flex: 1; min-width: 0; height: 110px; padding: 8px 0; border: 0; border-radius: 6px; resize: none; background: transparent; color: var(--tinta); font-size: 16.8px; line-height: 1.6; }
 .composer textarea::placeholder { color: var(--tenue); }
 .composer textarea:focus-visible { outline: 0; }
-.boton { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 44px; padding: 11px 20px; border: 1px solid transparent; border-radius: 999px; cursor: pointer; color: #fff; background: var(--violeta); font-size: 14.4px; font-weight: 500; transition: background 160ms; }
+.boton { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 44px; padding: 11px 20px; border: 1px solid transparent; border-radius: 999px; cursor: pointer; color: var(--sobre-violeta); background: var(--violeta); font-size: 14.4px; font-weight: 500; transition: background 160ms; }
 .boton:hover:not(:disabled) { background: var(--violeta-hover); }
 .boton:disabled { opacity: .45; cursor: not-allowed; }
 .ayuda-mensaje { margin: 10px 0 0; color: var(--tenue); text-align: center; font-size: 13.2px; }
 .error-mensaje { margin: 10px 0 0; color: var(--hielo); font-size: 14.4px; line-height: 1.6; }
 .pie { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding: 14px 36px max(14px, env(safe-area-inset-bottom)); border-top: 1px solid var(--linea); color: var(--tenue); font-size: 12px; }
-.pie b { color: #c7d3ea; font-weight: 400; }
+.pie b { color: var(--texto-suave); font-weight: 400; }
 
 .barra, .pie { border-image: var(--divisor-horizontal) 1; }
 

@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#05060f">
+  <script>
+    try {
+      if (localStorage.getItem("pickagent-tema") === "claro") {
+        document.documentElement.dataset.tema = "claro";
+        document.documentElement.style.colorScheme = "light";
+      }
+    } catch (e) {}
+  </script>
   <title>pickagent</title>
 </head>
 <body>
@@ -12,6 +20,10 @@
   <main class="pantalla">
     <header class="barra">
       <a class="marca-belo" href="/">pickagent</a>
+      <div class="tema" role="group" aria-label="Tema">
+        <button type="button" class="boton-tema" data-tema-opcion="oscuro" aria-pressed="true" aria-label="Tema oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14.6 3.1a8.4 8.4 0 1 0 6.4 13.4A7.2 7.2 0 0 1 14.6 3.1Z"/></svg></button>
+        <button type="button" class="boton-tema" data-tema-opcion="claro" aria-pressed="false" aria-label="Tema claro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6" fill="currentColor"/><path d="M12 2.4v2.3M12 19.3v2.3M2.4 12h2.3M19.3 12h2.3M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      </div>
     </header>
     <section class="hilo" id="mensajes" aria-label="Conversación" aria-live="polite"></section>
     <div class="zona-composer">

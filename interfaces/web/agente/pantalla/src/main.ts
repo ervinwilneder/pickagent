@@ -8,8 +8,12 @@ import type { CallToolResult } from "@modelcontextprotocol/client";
 import { conectarServidor, renderizarVista, resolver as ubicar, type Servidores } from "./host.ts";
 import "./estilos.css";
 import { icono, montarIconos } from "../../../../../shared/ui/phosphor.ts";
+import { montarCursor } from "./cursor.ts";
+import { montarTema } from "./tema.ts";
 
 montarIconos();
+montarCursor();
+montarTema();
 
 const MASTRA = import.meta.env.VITE_MASTRA_URL ?? "http://localhost:4111";
 /** Los enlaces anteriores abren el mismo modo único, sin conservar el selector. */

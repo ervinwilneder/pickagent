@@ -31,8 +31,21 @@ de la aprobación. No se agregan métricas, clientes, precios ni capacidades.
   permanecen porque son opciones relevantes para ese público.
 - Las ventajas de Belo se muestran en un único recorrido. Se retira la
   comparación con el modo sin Belo que ya no existe en la interfaz.
-- Foco, selección, contraste y preferencias de movimiento/transparencia se
-  conservan. Se comprueban escritorio y móvil, navegación y enlace al chat.
+- Foco, contraste y preferencias de movimiento/transparencia se conservan.
+  El texto seleccionado se pinta con el violeta de la acción primaria. Se
+  comprueban escritorio y móvil, navegación y enlace al chat.
+- Con puntero fino, portada y chat muestran una esfera que sigue al cursor
+  e invierte el color de debajo. En reposo es un punto lleno de 16px; sobre
+  un enlace o botón se abre en un anillo de 100px; sobre un campo de texto
+  se vuelve una barra. Al presionar se achica a 0,85. En táctil no aparece.
+  Con movimiento reducido se pega al puntero, sin resorte.
+- El pie suma tres grupos. Las redes no navegan. ChatGPT, Claude, Gemini y
+  Perplexity abren una pregunta sobre pickagent en ese idioma. El idioma
+  reescribe toda la portada en español de Argentina, español de Latinoamérica
+  o inglés, y la elección queda en el navegador.
+- El encabezado de la portada y del chat tiene dos botones de tema. Oscuro
+  es el de siempre. Claro repinta fondo, texto, vidrio y bordes. La elección
+  queda en el navegador.
 
 ## Ajustes de la conversación
 
@@ -44,7 +57,8 @@ seguimiento debajo. Los importes, el orden del pago y el contenido restante
 conservan su significado.
 
 El precio principal y su moneda usan el violeta de marca en una variante
-clara para texto sobre fondo oscuro, con contraste suficiente también en ARS.
+clara para texto sobre fondo oscuro. En tema claro esa variante es más oscura
+para seguir leyéndose. El contraste alcanza también en ARS.
 
 ## Imagen de envíos y pagos
 

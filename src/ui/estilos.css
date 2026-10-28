@@ -31,3 +31,34 @@ li .monto { font-variant-numeric: tabular-nums; text-align: right; }
 li .monto.entra { color: var(--positivo); }
 li .monto.sale { color: var(--negativo); }
 .estado { font-size: 12px; color: var(--tenue); min-height: 1em; }
+
+/* Operación */
+.operacion { border: 1px solid var(--borde); border-radius: 14px; padding: 16px; max-width: 520px; }
+.operacion .titulo { font-size: 13px; color: var(--tenue); text-transform: uppercase; letter-spacing: .04em; }
+.operacion .principal { font-size: 26px; font-weight: 600; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+.operacion .destino { color: var(--texto); }
+.operacion .destino small { color: var(--tenue); display: block; }
+.operacion dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 14px 0; font-size: 14px; }
+.operacion dt { color: var(--tenue); }
+.operacion dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.operacion .vence { font-size: 13px; color: var(--tenue); }
+.operacion .vence.pronto { color: var(--negativo); }
+.acciones { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.acciones .primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+.acciones button:disabled { opacity: .5; cursor: default; }
+.resultado { margin-top: 12px; font-size: 14px; }
+.resultado.ok { color: var(--positivo); }
+.resultado.error { color: var(--negativo); }
+.aviso { border: 1px dashed var(--borde); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--tenue); margin-top: 12px; }
+
+/* Listas de contactos y direcciones */
+.tarjetas { display: grid; gap: 10px; }
+.tarjeta { border: 1px solid var(--borde); border-radius: 12px; padding: 12px; }
+.tarjeta .nombre { font-weight: 600; }
+.tarjeta .etiqueta { font-size: 11px; color: var(--tenue); text-transform: uppercase; letter-spacing: .04em; margin-left: 6px; }
+.tarjeta .linea { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 6px 0; border-top: 1px solid var(--borde); font-size: 13px; }
+.tarjeta .linea:first-of-type { border-top: 0; }
+.tarjeta code { font-family: var(--font-mono, ui-monospace, Menlo, monospace); font-size: 12px; word-break: break-all; }
+.tarjeta .copiar { font-size: 12px; padding: 3px 8px; white-space: nowrap; }
+.buscador { display: flex; gap: 8px; margin: 10px 0 14px; }
+.buscador input { flex: 1; border: 1px solid var(--borde); border-radius: 8px; padding: 6px 10px; background: transparent; color: var(--texto); font: inherit; }

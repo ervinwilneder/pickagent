@@ -1,7 +1,6 @@
 /** Vista "cuenta": saldos y movimientos en los términos del producto belo. */
-import { App, applyDocumentTheme, applyHostFonts, applyHostStyleVariables, type McpUiHostContext } from "@modelcontextprotocol/ext-apps";
 import type { CallToolResult } from "@modelcontextprotocol/client";
-import "./estilos.css";
+import { conectar, datos, fecha, fmt, moneda, textoDeError } from "./comun.ts";
 
 interface Saldo { currencyCode: string; available: string; yield?: { rate: string; totalYield?: string } }
 interface Movimiento {
@@ -14,16 +13,13 @@ const movimientosEl = document.getElementById("movimientos")!;
 const estadoEl = document.getElementById("estado")!;
 const actualizarBtn = document.getElementById("actualizar")!;
 
-const moneda = (c: string) => (c === "ARGt" ? "ARS" : c);
-const fmt = (monto: string, c: string) => {
-  const n = Number(monto);
-  const decimales = ["ARS", "ARGt", "BRL"].includes(c) ? 2 : n < 1 ? 6 : 2;
-  return `${n.toLocaleString("es-AR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales })} ${moneda(c)}`;
-};
-const fecha = (iso: string) => new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
-
 function pintar(result: CallToolResult) {
-  const { saldos = [], movimientos = [] } = (result.structuredContent ?? {}) as { saldos?: Saldo[]; movimientos?: Movimiento[] };
+  const error = textoDeError(result);
+  if (error) {
+    estadoEl.textContent = error;
+    return;
+  }
+  const { saldos = [], movimientos = [] } = datos<{ saldos?: Saldo[]; movimientos?: Movimiento[] }>(result);
   saldosEl.replaceChildren(
     ...saldos.filter((s) => Number(s.available) > 0).map((s) => {
       const el = document.createElement("article");
@@ -46,26 +42,12 @@ function pintar(result: CallToolResult) {
       return li;
     }),
   );
-  estadoEl.textContent = result.isError ? String(result.content?.[0] && "text" in result.content[0] ? result.content[0].text : "Error") : `Actualizado ${new Date().toLocaleTimeString("es-AR")}`;
+  estadoEl.textContent = `Actualizado ${new Date().toLocaleTimeString("es-AR")}`;
 }
-
-function contexto(ctx: McpUiHostContext) {
-  if (ctx.theme) applyDocumentTheme(ctx.theme);
-  if (ctx.styles?.variables) applyHostStyleVariables(ctx.styles.variables);
-  if (ctx.styles?.css?.fonts) applyHostFonts(ctx.styles.css.fonts);
-}
-
-const app = new App({ name: "belo cuenta", version: "0.0.0" });
-app.ontoolresult = pintar;
-app.onhostcontextchanged = contexto;
-app.onerror = console.error;
 
 actualizarBtn.addEventListener("click", async () => {
   estadoEl.textContent = "Actualizando…";
   pintar(await app.callServerTool({ name: "cuenta", arguments: { movimientos: 10 } }));
 });
 
-app.connect().then(() => {
-  const ctx = app.getHostContext();
-  if (ctx) contexto(ctx);
-});
+const app = conectar("belo cuenta", { alResultado: pintar });

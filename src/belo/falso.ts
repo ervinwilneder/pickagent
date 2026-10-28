@@ -91,7 +91,7 @@ export function beloFalso(): BeloPort {
       const quoteAmount = enBase ? monto * precio : monto;
       exigir(p.type === "BUY" ? quote : base, p.type === "BUY" ? quoteAmount : baseAmount);
       const id = randomUUID();
-      pendientes.set(id, tx("swap", dec(baseAmount, 6), base, "pending", { debits: [{ currency: p.type === "BUY" ? quote : base, amount: dec(p.type === "BUY" ? quoteAmount : baseAmount) }] }, 0));
+      pendientes.set(id, { ...tx("swap", dec(baseAmount, 6), base, "pending", { debits: [{ currency: p.type === "BUY" ? quote : base, amount: dec(p.type === "BUY" ? quoteAmount : baseAmount) }] }, 0), id });
       return { id, status: "pending", pairCode: p.pairCode, type: p.type, price: dec(precio, 18), baseAmount: dec(baseAmount, 6), quoteAmount: dec(quoteAmount, 2), expiresAt: vence() };
     },
     async confirmarSwap(id) { return confirmar(id); },
@@ -100,7 +100,7 @@ export function beloFalso(): BeloPort {
       const fee = p.addressType === "TRON" ? 1.5 : p.addressType === "POLYGON" ? 1 : 0;
       exigir(p.currency, monto + fee);
       const id = randomUUID();
-      pendientes.set(id, tx("transfer", dec(monto, 6), p.currency, "pending", { debits: [{ currency: p.currency, amount: dec(monto + fee, 6) }] }, 0));
+      pendientes.set(id, { ...tx("transfer", dec(monto, 6), p.currency, "pending", { debits: [{ currency: p.currency, amount: dec(monto + fee, 6) }] }, 0), id });
       return { id, status: "pending", address: p.address, addressType: p.addressType, currency: p.currency, amount: dec(monto, 18), fee: dec(fee, 2), exchangeRate: null, expiresAt: vence(), debits: [{ currency: p.currency, amount: dec(monto + fee) }] } as never;
     },
     async confirmarTransferencia(id) { return confirmar(id); },
@@ -114,8 +114,8 @@ export function beloFalso(): BeloPort {
       const ars = usdt * precioUsdtArs;
       exigir("ARGt", ars);
       const id = randomUUID();
-      pendientes.set(id, tx("pix_payout", dec(usdt, 6), "USDT", "pending", { debits: [{ currency: "ARS", amount: dec(ars) }], netAmount: dec(brl), netCurrency: "BRL" }, 0));
-      return { id, status: "pending", address: p.address, amount: dec(brl), currency: "BRL", price: dec(precioUsdtBrl, 4), expiresAt: vence(), debits: [{ currency: "ARS", amount: dec(ars) }] } as never;
+      pendientes.set(id, { ...tx("pix_payout", dec(usdt, 6), "USDT", "pending", { debits: [{ currency: "ARS", amount: dec(ars) }], netAmount: dec(brl), netCurrency: "BRL" }, 0), id });
+      return { id, status: "pending", address: p.address, currency: "BRL", amount: dec(brl), fee: null, exchangeRate: { base: "USDT", quote: "BRL", rate: dec(precioUsdtBrl, 4) }, expiresAt: vence(), debits: [{ currency: "ARS", amount: dec(ars) }] };
     },
     async confirmarPix(id) { return confirmar(id); },
     async metodosCobro() {

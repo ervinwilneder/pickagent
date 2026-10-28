@@ -8,10 +8,10 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build:ui": "cross-env INPUT=src/ui/cuenta.html vite build",
+    "build:ui": "for f in src/ui/*.html; do cross-env INPUT=$f vite build || exit 1; done",
     "build": "npm run typecheck && npm run build:ui",
     "serve": "tsx main.ts",
-    "dev": "cross-env NODE_ENV=development concurrently \"cross-env INPUT=src/ui/cuenta.html vite build --watch\" \"tsx --watch main.ts\"",
+    "dev": "cross-env NODE_ENV=development concurrently \"npm run build:ui -- --watch\" \"tsx --watch main.ts\"",
     "belo:types": "openapi-typescript ../../.development/research/api/belo-baas-openapi.json -o src/belo/openapi.d.ts",
     "escucha": "tsx escucha.ts"
   },

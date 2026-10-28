@@ -1,9 +1,10 @@
 /**
  * Eventos del server (extensión MCP Events, borrador SEP-3415): lo que pasa en
- * la cuenta de belo, para que un agente o una app reaccionen sin preguntar.
+ * la cuenta de belo, para que un agente reaccione sin preguntar.
  *
- * belo no emite eventos: el vigía relee el historial cada tanto y emite un
- * `movimiento.nuevo` por cada movimiento que no había visto.
+ * belo no emite eventos y el server corre sin estado (Vercel), así que el
+ * evento es de tipo poll: el cliente trae un cursor (la fecha del último
+ * movimiento que vio) y el server lee belo desde ahí.
  */
 import { defineEvent } from "@mastra/mcp";
 import { z } from "zod";
@@ -23,45 +24,37 @@ export const movimiento = z.object({
 export type Movimiento = z.infer<typeof movimiento>;
 
 export function resumir(t: Transaccion): Movimiento {
+  const moneda = t.currency ?? "";
   return {
     id: t.id,
     tipo: t.type,
     estado: t.status,
     monto: t.amount ?? "",
-    moneda: (t.currency ?? "") === "ARGt" ? "ARS" : (t.currency ?? ""),
+    moneda: moneda === "ARGt" ? "ARS" : moneda,
     contraparte: t.receipt?.counterparty?.name ?? null,
     fecha: t.createdAt,
   };
 }
 
-export const eventos = {
-  "movimiento.nuevo": defineEvent({
-    description: "Un movimiento nuevo en la cuenta de belo: un depósito recibido, una transferencia, una conversión o un pago por pix. Filtrable por tipo.",
-    inputSchema: z.object({ tipo: tipoMovimiento.optional().describe("Solo movimientos de este tipo") }),
-    payloadSchema: movimiento,
-    match: (args, data) => !args.tipo || data.tipo === args.tipo,
-  }),
-};
-
-/** Relee el historial y emite lo nuevo. Devuelve cómo pararlo. */
-export function vigilar(cuenta: BeloPort, emitir: (nombre: string, data: Movimiento, opciones: { eventId: string; timestamp: string }) => Promise<unknown>, cadaMs = 5_000): () => void {
-  const vistos = new Set<string>();
-  let primera = true;
-  const tick = async () => {
-    try {
-      const { data } = await cuenta.transacciones({ limit: 20 });
-      for (const t of data.reverse()) {
-        if (vistos.has(t.id)) continue;
-        vistos.add(t.id);
-        if (primera) continue; // la primera pasada solo aprende lo que ya existía
-        await emitir("movimiento.nuevo", resumir(t), { eventId: t.id, timestamp: t.createdAt });
-      }
-      primera = false;
-    } catch (e) {
-      console.error("vigía belo:", e instanceof Error ? e.message : e);
-    }
+export function eventos(cuenta: BeloPort) {
+  return {
+    "movimiento.nuevo": defineEvent({
+      description: "Un movimiento nuevo en la cuenta de belo: un depósito recibido, una transferencia, una conversión o un pago por pix. Filtrable por tipo.",
+      inputSchema: z.object({ tipo: tipoMovimiento.optional().describe("Solo movimientos de este tipo") }),
+      payloadSchema: movimiento,
+      match: (args, data) => !args.tipo || data.tipo === args.tipo,
+      pollIntervalMs: 5_000,
+      async poll({ arguments: args, cursor, maxEvents }) {
+        // Sin cursor: "desde ahora". No se reproduce historia vieja.
+        if (!cursor) return { events: [], cursor: new Date().toISOString(), nextPollMs: 5_000 };
+        const { data } = await cuenta.transacciones({ from: cursor, type: args.tipo, limit: Math.min(maxEvents, 100) });
+        const nuevos = data.filter((t) => t.createdAt > cursor).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+        return {
+          events: nuevos.map((t) => ({ eventId: t.id, timestamp: t.createdAt, data: resumir(t) })),
+          cursor: nuevos.at(-1)?.createdAt ?? cursor,
+          nextPollMs: 5_000,
+        };
+      },
+    }),
   };
-  void tick();
-  const timer = setInterval(tick, cadaMs);
-  return () => clearInterval(timer);
 }

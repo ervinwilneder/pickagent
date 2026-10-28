@@ -1,8 +1,8 @@
-/** Arranque: Streamable HTTP en PORT (3001 por defecto) o stdio con --stdio. */
+/** Arranque local: Streamable HTTP en PORT (3001 por defecto) o stdio con --stdio. */
 import http from "node:http";
 import { crearServer } from "./server.ts";
 
-const { server, parar } = crearServer();
+const { server } = crearServer();
 
 if (process.argv.includes("--stdio")) {
   await server.startStdio();
@@ -18,7 +18,6 @@ if (process.argv.includes("--stdio")) {
   });
   httpServer.listen(port, () => console.log(`belo MCP App en http://localhost:${port}/mcp`));
   const apagar = async () => {
-    parar();
     await server.close();
     httpServer.close(() => process.exit(0));
   };

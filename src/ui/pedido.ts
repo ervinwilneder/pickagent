@@ -38,7 +38,7 @@ function pintar(result: CallToolResult) {
   campo("fragil").checked = Boolean(borrador.cuidados?.includes("fragil") || borrador.fragil);
   campo("refrigerado").checked = Boolean(borrador.cuidados?.includes("refrigerado") || borrador.refrigerado);
   const faltan = ["origen", "destino", "fechaLimite", "mercaderia", "pesoKg", "volumenM3", "contacto"].filter((k) => !campo(k).value);
-  estadoEl.textContent = faltan.length ? `faltan ${faltan.length} datos` : "revisá y confirmá";
+  estadoEl.textContent = faltan.length ? `faltan ${faltan.length} datos` : "listo para buscar";
   (faltan[0] ? campo(faltan[0]) : boton).focus();
 }
 

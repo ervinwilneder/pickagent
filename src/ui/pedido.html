@@ -8,9 +8,9 @@
 </head>
 <body>
   <section class="panel" aria-label="Pedido de envío">
-    <header class="cabecera"><span>pickagent_envio</span><span class="estado" id="estado">completá el pedido</span></header>
+    <header class="cabecera"><span>pickagent · nuevo envío</span><span class="estado" id="estado">completá el pedido</span></header>
     <form class="cuerpo" id="form">
-      <p class="prompt">pickagent enviar --completar</p>
+      <p class="prompt">Contanos qué mandás y para cuándo. Nosotros buscamos quién lo lleva.</p>
       <div class="campos">
         <div class="campo"><label for="origen">Retiro en</label><input id="origen" name="origen" list="localidades" required placeholder="Villa Crespo"></div>
         <div class="campo"><label for="destino">Entrega en</label><input id="destino" name="destino" list="localidades" required placeholder="Rosario"></div>
@@ -29,7 +29,7 @@
       <div class="acciones"><button class="boton primario" id="confirmar" type="submit">Buscar ofertas ↵</button></div>
       <p class="resultado" id="resultado"></p>
     </form>
-    <footer class="pie"><span>motor://<b>logistica</b></span><span>paga://<b>belo</b></span></footer>
+    <footer class="pie"><span>transportistas <b>agregados</b></span><span>pago <b>con belo</b></span></footer>
   </section>
   <script type="module" src="./pedido.ts"></script>
 </body>

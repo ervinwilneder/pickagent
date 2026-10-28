@@ -26,8 +26,8 @@ function pintar(result: CallToolResult) {
   if (pedido) {
     const de = pedido.origen.localidad.nombre;
     const a = pedido.destino.localidad.nombre;
-    promptEl.textContent = `pickagent ofertas --de "${de}" --a "${a}" --antes ${cuando(pedido.fechaLimite)}`;
-    rutaEl.innerHTML = `<em>&gt;</em> ${esc(de)} → ${esc(a)}${ofertas[0] ? ` · ${ofertas[0].distanciaKm} km` : ""}`;
+    promptEl.textContent = `${pedido.mercaderia}, ${pedido.pesoKg} kg · entregar antes de ${cuando(pedido.fechaLimite)}`;
+    rutaEl.innerHTML = `${esc(de)} <em>→</em> ${esc(a)}${ofertas[0] ? ` <span class="chip">${ofertas[0].distanciaKm} km</span>` : ""}`;
   }
   estadoEl.textContent = ofertas.length ? `${ofertas.length} ofertas` : "sin ofertas";
   estadoEl.className = ofertas.length ? "estado" : "estado alerta";
@@ -37,7 +37,7 @@ function pintar(result: CallToolResult) {
     ...ofertas.map((o, i) =>
       el("article", `oferta${i === 0 ? " mejor" : ""}`, `
         <div>
-          <div class="proveedor">${esc(o.transportista.nombre)} <span class="chip ${i === 0 ? "verde" : ""}">${i === 0 ? "mejor precio" : `★ ${o.transportista.calificacion.toFixed(1)}`}</span>${o.transportista.modo === "conectado" ? ` <span class="chip">api</span>` : ""}${o.contraEntrega ? ` <span class="chip verde">belo air · contra entrega</span>` : ""}</div>
+          <div class="proveedor">${esc(o.transportista.nombre)} <span class="chip ${i === 0 ? "verde" : ""}">${i === 0 ? "mejor precio" : `★ ${o.transportista.calificacion.toFixed(1)}`}</span>${o.transportista.modo === "conectado" ? ` <span class="chip">api</span>` : ""}${o.contraEntrega ? ` <span class="chip">contra entrega con belo air</span>` : ""}</div>
           <div class="detalle">${esc(o.servicio)} · ${esc(vehiculo[o.vehiculo] ?? o.vehiculo)} · ${o.horasViaje} h</div>
           <div class="detalle">retiro ${esc(cuando(o.retiro))} · entrega ${esc(cuando(o.entrega))}</div>
           ${o.condiciones?.length ? `<div class="detalle">${esc(o.condiciones.join(" · "))}</div>` : ""}

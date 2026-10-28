@@ -48,7 +48,7 @@ const llamadas = new Map<string, { nombre: string; args: Record<string, unknown>
 function burbuja(rol: "persona" | "agente" | "evento", cuando?: string | number) {
   const b = document.createElement("article");
   b.className = `mensaje ${rol}`;
-  b.innerHTML = `<header><span class="rol">${rol === "persona" ? "$ vos" : rol === "agente" ? esc(NOMBRE[AGENTE] ?? AGENTE) : "[evento]"}</span><span class="cuando">${esc(hora(cuando))}</span></header><div class="contenido"></div>`;
+  b.innerHTML = `<header><span class="rol">${rol === "persona" ? "vos" : rol === "agente" ? esc(NOMBRE[AGENTE] ?? AGENTE) : "evento"}</span><span class="cuando">${esc(hora(cuando))}</span></header><div class="contenido"></div>`;
   mensajesEl.append(b);
   b.scrollIntoView({ block: "end" });
   return b;
@@ -102,7 +102,7 @@ function abrirLlamada(id: string, nombre: string, args: Record<string, unknown>)
   textoActual = null;
   const caja = document.createElement("div");
   caja.className = "llamada";
-  caja.innerHTML = `<span class="marca">[..]</span> usando <code>${esc(toolDelServidor(nombre))}</code>`;
+  caja.innerHTML = `<span class="marca">…</span> usando <code>${esc(toolDelServidor(nombre))}</code>`;
   contenido(burbujaActual!).append(caja);
   let resolver!: (r: CallToolResult) => void;
   let rechazar!: (e: unknown) => void;
@@ -128,7 +128,7 @@ function abrirLlamada(id: string, nombre: string, args: Record<string, unknown>)
 function cerrarLlamada(id: string, resultado: unknown, error?: boolean) {
   const l = llamadas.get(id);
   if (!l) return;
-  l.caja.innerHTML = `<span class="marca ${error ? "mal" : "ok"}">[${error ? "!!" : "OK"}]</span> ${error ? "falló" : "usó"} <code>${esc(toolDelServidor(l.nombre))}</code>`;
+  l.caja.innerHTML = `<span class="marca ${error ? "mal" : "ok"}">${error ? "✕" : "✓"}</span> ${error ? "falló" : "usó"} <code>${esc(toolDelServidor(l.nombre))}</code>`;
   const r = resultado as { content?: unknown; structuredContent?: unknown; isError?: boolean } | null;
   const comoResultado: CallToolResult = r && Array.isArray(r.content)
     ? (r as CallToolResult)
@@ -171,7 +171,7 @@ function pintarHistorial(mensajes: { role: string; content?: unknown; createdAt?
         if (p.type?.startsWith("tool") && p.toolName) {
           const caja = document.createElement("div");
           caja.className = "llamada";
-          caja.innerHTML = `<span class="marca ok">[OK]</span> usó <code>${esc(toolDelServidor(p.toolName))}</code>`;
+          caja.innerHTML = `<span class="marca ok">✓</span> usó <code>${esc(toolDelServidor(p.toolName))}</code>`;
           cont.append(caja);
           const rs = ubicar(servidores, p.toolName);
           const salida = p.output ?? p.result;

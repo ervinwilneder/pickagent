@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light dark">
   <title>pickagent</title>
 </head>
 <body>
   <main class="pantalla">
     <header class="barra">
-      <span class="marca-belo">pickagent <span class="apagado">/ <span id="quien">pickagent</span></span></span>
+      <span class="marca-belo">pickagent <span class="apagado">· <span id="quien">pickagent</span></span></span>
       <span class="centro controles">
         <span class="switch" role="group" aria-label="Agente"><button type="button" data-agente="pickagent">pickagent</button><button type="button" data-agente="asistente">mi asistente</button></span>
         <label class="interruptor" hidden><input type="checkbox" id="belo-switch"><span class="pista"><span class="perilla"></span></span><span id="belo-etiqueta">belo conectado</span></label>
@@ -20,10 +20,10 @@
     <section class="hilo" id="mensajes" aria-live="polite"></section>
     <form class="composer" id="composer">
       <span class="prompt-mark">$</span>
-      <input id="texto" type="text" placeholder="escribile al agente" autocomplete="off">
+      <input id="texto" type="text" placeholder="Contá qué querés mandar" autocomplete="off">
       <button class="boton primario" id="enviar" type="submit">Enviar ↵</button>
     </form>
-    <footer class="pie"><span>motor://<b>logistica</b></span><span>paga://<b>belo</b></span><span>evento://<b>movimiento.nuevo</b></span><span>mcp://<b>apps + events</b></span></footer>
+    <footer class="pie"><span>transportistas <b>agregados</b></span><span>pagos <b>con belo</b></span><span>eventos <b>en vivo</b></span><span>mcp <b>apps + events</b></span></footer>
   </main>
   <script type="module" src="/src/main.ts"></script>
 </body>

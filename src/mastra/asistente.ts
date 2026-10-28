@@ -4,6 +4,9 @@
  * de belo de la persona conectado, y sin él.
  */
 import { Agent } from "@mastra/core/agent";
+
+/** La fecha y hora actuales en Argentina, para resolver "el lunes a las 18" sin adivinar. */
+const ahora = () => `Hoy es ${new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })} (hora de Argentina, UTC-3). Cuando la persona dice un día relativo, calculá la fecha a partir de hoy y usá la zona -03:00.`;
 import { createTool } from "@mastra/core/tools";
 import { MCPClient, MCPEventsSignalProvider } from "@mastra/mcp";
 import { Memory } from "@mastra/memory";
@@ -43,9 +46,7 @@ export const asistente = new Agent({
   id: "asistente",
   name: "Mi asistente (con belo)",
   description: "El asistente personal de la persona, con su cuenta de belo conectada: paga los envíos en un paso, con descuento, y confirma solo cuando sale el pago.",
-  instructions: `${base}
-
-Tenés conectada la cuenta de belo de la persona (belo_*). Eso te da tres ventajas que tenés que usar y contar cuando vengan al caso:
+  instructions: () => `${base}\n\n${ahora()}\n\nTenés conectada la cuenta de belo de la persona (belo_*). Eso te da tres ventajas que tenés que usar y contar cuando vengan al caso:
 1. Precio con belo: las ofertas traen un precio de lista y un precio pagando con belo, más barato. Siempre mostrá el ahorro.
 2. Pago en un paso: después de reservar, cotizá la transferencia en belo (belo_cotizar_transferencia con el destinatario y el monto que devuelve la reserva, moneda ARGt), mostrá la vista de aprobación y, cuando la persona apruebe, confirmá con belo_confirmar y marcá la reserva pagada con logistica_marcar_pagada. La persona no copia CVU ni montos.
 3. Confirmación automática: cuando te llega una notificación de un movimiento nuevo en belo que coincide con un pago de envío pendiente, marcá la reserva pagada y avisale a la persona con el código de seguimiento; no esperes a que pregunte.
@@ -61,9 +62,7 @@ export const asistenteSinBelo = new Agent({
   id: "asistente-sin-belo",
   name: "Mi asistente (sin belo)",
   description: "El mismo asistente personal, sin belo conectado: consigue las ofertas pero el pago queda a cargo de la persona.",
-  instructions: `${base}
-
-No tenés conectada ninguna cuenta de belo. Podés reservar, pero el pago queda a cargo de la persona: pasale el CVU o belotag del transportista y el monto de lista (sin el descuento por belo), y decile que la reserva queda pendiente hasta que el transportista vea el pago. Cuando corresponda, contale en una línea que si conecta su cuenta de belo paga en un paso, con descuento y con confirmación automática.`,
+  instructions: () => `${base}\n\n${ahora()}\n\nNo tenés conectada ninguna cuenta de belo. Podés reservar, pero el pago queda a cargo de la persona: pasale el CVU o belotag del transportista y el monto de lista (sin el descuento por belo), y decile que la reserva queda pendiente hasta que el transportista vea el pago. Cuando corresponda, contale en una línea que si conecta su cuenta de belo paga en un paso, con descuento y con confirmación automática.`,
   model: process.env.BELO_AGENTE_MODELO ?? "anthropic/claude-sonnet-5-5",
   tools: { ...(await sinBelo.listTools()), preguntar_a_pickagent: preguntarAPickagent },
   memory: new Memory({ storage }),

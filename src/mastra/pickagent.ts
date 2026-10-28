@@ -3,6 +3,9 @@
  * vistas), suscripto a sus eventos por señales, con memoria persistente.
  */
 import { Agent } from "@mastra/core/agent";
+
+/** La fecha y hora actuales en Argentina, para resolver "el lunes a las 18" sin adivinar. */
+const ahora = () => `Hoy es ${new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })} (hora de Argentina, UTC-3). Cuando la persona dice un día relativo, calculá la fecha a partir de hoy y usá la zona -03:00.`;
 import { LibSQLStore } from "@mastra/libsql";
 import { MCPClient, MCPEventsSignalProvider, MCPServer } from "@mastra/mcp";
 import { Memory } from "@mastra/memory";
@@ -36,7 +39,7 @@ export const agente = new Agent({
   id: "pickagent",
   name: "pickagent",
   description: "Resuelve envíos de mercadería con los proveedores de logística agregados y cobra por belo; reacciona a los movimientos de la cuenta.",
-  instructions: instrucciones,
+  instructions: () => `${instrucciones}\n\n${ahora()}`,
   model: process.env.BELO_AGENTE_MODELO ?? "anthropic/claude-sonnet-5-5",
   tools: await belo.listTools(),
   memory: new Memory({ storage }),

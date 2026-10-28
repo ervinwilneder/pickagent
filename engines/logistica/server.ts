@@ -8,7 +8,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import { datosDePedido, ErrorDeLogistica, motor, type Motor } from "./src/motor/casos.ts";
-import { estadoLegible, modoPagoLegible, vehiculoLegible } from "./src/motor/dominio.ts";
+import { adjuntoLegible, estadoLegible, modoPagoLegible, tipoTramoLegible, vehiculoLegible } from "./src/motor/dominio.ts";
+import { puntosDeCobroEnSpotme } from "./src/motor/spotme.ts";
 import { localidades } from "./src/motor/localidades.ts";
 import { almacenEnArchivo } from "./src/motor/archivo.ts";
 import { almacenEnMemoria, registroDeEjemplo } from "./src/motor/memoria.ts";
@@ -34,7 +35,12 @@ function cuentaPickagent() {
 /** Con LOGISTICA_DATOS, el almacén vive en ese archivo y sobrevive a los reinicios; sin él, en memoria. */
 const almacen = () => (process.env.LOGISTICA_DATOS ? almacenEnArchivo(process.env.LOGISTICA_DATOS) : almacenEnMemoria());
 
-export function crearServer(m: Motor = motor(almacen(), registroDeEjemplo(), cuentaPickagent())) {
+/** Con SPOTME_MCP_URL, cada traspaso con CVU tiene un punto de cobro en Spotme; sin ella, se liquida por lote. */
+const spotme = () => (process.env.SPOTME_MCP_URL ? puntosDeCobroEnSpotme(process.env.SPOTME_MCP_URL) : undefined);
+const describirTramos = (r: { tramos: { tramo: { n: number; tipo: "directo" | "linea" | "ultima_milla"; transportista: { nombre: string }; precioBelo: number; retiro: string; entrega: string }; adjuntos: { nombre: string; precio: number }[]; puntoDeCobro?: { reclamadoEn?: string; pagado: boolean } }[] }) =>
+  r.tramos.map((t) => `tramo ${t.tramo.n} (${tipoTramoLegible[t.tramo.tipo]}): ${t.tramo.transportista.nombre}, ${hora(t.tramo.retiro)} → ${hora(t.tramo.entrega)}, ${pesos(t.tramo.precioBelo)} con belo${t.adjuntos.length ? ` + ${t.adjuntos.map((a) => `${a.nombre} ${pesos(a.precio)}`).join(" + ")}` : ""}${t.puntoDeCobro ? t.puntoDeCobro.pagado ? ", liquidado por el punto de cobro" : t.puntoDeCobro.reclamadoEn ? `, traspaso confirmado ${hora(t.puntoDeCobro.reclamadoEn)}` : ", con punto de cobro pendiente" : ""}`).join("; ");
+
+export function crearServer(m: Motor = motor(almacen(), registroDeEjemplo(), cuentaPickagent(), undefined, spotme())) {
   const tools = {
     pedido_envio: createTool({
       id: "pedido_envio",
@@ -58,16 +64,16 @@ export function crearServer(m: Motor = motor(almacen(), registroDeEjemplo(), cue
 
     ofertas: createTool({
       id: "ofertas",
-      description: "Pide cotización a todos los transportistas (catálogo y conectados por API) para un pedido y muestra las mejores ofertas (hasta cinco, ordenadas por precio pagando con belo) para que la persona elija. Cada oferta trae transportista, servicio, vehículo, retiro y entrega estimados, precio de lista, precio con belo y condiciones.",
+      description: "Pide cotización a todos los transportistas (catálogo y conectados por API) para un pedido y muestra las mejores ofertas (hasta cinco, ordenadas por precio pagando con belo) para que la persona elija. Cada oferta es una cadena de uno o dos tramos (puerta a puerta, o línea hasta el depósito más última milla), cada tramo con su transportista, vehículo, horarios, precio con belo y productos adjuntos disponibles (seguro del tramo si hay valor declarado, entrega a tiempo). La persona elige la oferta y los adjuntos en la vista.",
       inputSchema: z.object({ pedidoId: z.string().uuid() }),
       outputSchema: z.object({ resumen: z.string(), pedido: z.any(), ofertas: z.array(z.any()), consultados: z.number(), fallas: z.array(z.object({ transportista: z.string(), motivo: z.string() })) }),
       mcp: { _meta: { ui: { resourceUri: UI.ofertas } } },
       execute: ({ pedidoId }) => intentar(async () => {
         const r = await m.ofertasPara(pedidoId);
-        const lineas = r.ofertas.map((o, i) => `${i + 1}. ${o.transportista.nombre} · ${o.servicio} (${vehiculoLegible[o.vehiculo]}): retiro ${hora(o.retiro)}, entrega ${hora(o.entrega)}, ${pesos(o.precio)} de lista, ${pesos(o.precioBelo)} con belo (${Math.round(o.descuentoBelo * 100)} % off)${o.contraEntrega ? "; acepta contra entrega con belo air" : ""}${o.condiciones?.length ? `; ${o.condiciones.join("; ")}` : ""}. id ${o.id}`);
+        const lineas = r.ofertas.map((o, i) => `${i + 1}. ${o.tramos.length === 1 ? `${o.tramos[0]!.transportista.nombre} · ${o.tramos[0]!.servicio} (${vehiculoLegible[o.tramos[0]!.vehiculo]})` : `${o.tramos.length} tramos: ${o.tramos.map((t) => `${t.transportista.nombre} (${tipoTramoLegible[t.tipo]}, ${vehiculoLegible[t.vehiculo]}, ${pesos(t.precioBelo)} con belo)`).join(" + ")}`}: retiro ${hora(o.retiro)}, entrega ${hora(o.entrega)}, ${pesos(o.precio)} de lista, ${pesos(o.precioBelo)} con belo${o.contraEntrega ? ", acepta contra entrega con belo air" : ""}. Adjuntos por tramo: ${o.tramos.map((t) => `t${t.n} ${t.adjuntosDisponibles.map((a) => `${adjuntoLegible[a.tipo]} ${pesos(a.precio)}`).join(", ")}`).join("; ")}. Id ${o.id}`);
         const fallas = r.fallas.length ? ` Sin respuesta de: ${r.fallas.map((f) => `${f.transportista} (${f.motivo})`).join(", ")}.` : "";
         const resumen = r.ofertas.length
-          ? `${r.ofertas.length} ofertas de ${r.consultados} transportistas para ${r.pedido.origen.localidad.nombre} → ${r.pedido.destino.localidad.nombre} (${r.ofertas[0]!.distanciaKm} km):\n${lineas.join("\n")}${fallas}`
+          ? `${r.ofertas.length} ofertas de ${r.consultados} transportistas para ${r.pedido.origen.localidad.nombre} → ${r.pedido.destino.localidad.nombre} (${r.ofertas[0]!.tramos.reduce((k, t) => k + t.distanciaKm, 0)} km):\n${lineas.join("\n")}${fallas}`
           : `Ningún transportista de ${r.consultados} puede con este envío (cobertura, capacidad, cuidados o plazo). Probá con más plazo o menos carga.${fallas}`;
         return { resumen, pedido: r.pedido, ofertas: r.ofertas, consultados: r.consultados, fallas: r.fallas };
       }),
@@ -75,16 +81,16 @@ export function crearServer(m: Motor = motor(almacen(), registroDeEjemplo(), cue
 
     reservar: createTool({
       id: "reservar",
-      description: "Reserva una oferta elegida por la persona con el transportista y devuelve el cobro: cuánto (ya con el descuento por belo), en qué moneda, a quién pagarle y el modo. Modo 'anticipado': el cliente le paga a pickagent (su belotag); cotizá la transferencia en belo por ese monto, mostrásela a la persona y, cuando apruebe, confirmá. pickagent marca la reserva pagada cuando ve entrar el pago en su cuenta. Modo 'contra_entrega_belo_air' (solo si la oferta lo acepta): al retirar o entregar, el chofer pide el monto exacto desde su belo con belo air, la persona acerca su teléfono, revisa y confirma, y la plata llega al instante; no cotices nada; cuando llegue el movimiento de belo, marcá la reserva pagada.",
-      inputSchema: z.object({ ofertaId: z.string().uuid(), modoPago: z.enum(["anticipado", "contra_entrega_belo_air"]).default("anticipado") }),
+      description: "Reserva una oferta elegida por la persona (todos sus tramos, con los adjuntos que eligió) y devuelve el cobro total: cuánto (ya con el descuento por belo), en qué moneda, a quién pagarle y el modo. Modo 'anticipado': el cliente le paga a pickagent (su belotag); cotizá la transferencia en belo por ese monto, mostrásela a la persona y, cuando apruebe, confirmá. pickagent marca la reserva pagada cuando ve entrar el pago en su cuenta. Modo 'contra_entrega_belo_air' (solo si la oferta lo acepta): al retirar o entregar, el chofer pide el monto exacto desde su belo con belo air, la persona acerca su teléfono, revisa y confirma, y la plata llega al instante; no cotices nada; cuando llegue el movimiento de belo, marcá la reserva pagada.",
+      inputSchema: z.object({ ofertaId: z.string().uuid(), modoPago: z.enum(["anticipado", "contra_entrega_belo_air"]).default("anticipado"), adjuntos: z.array(z.object({ tramo: z.number().int().min(1), tipo: z.enum(["seguro", "entrega_a_tiempo"]) })).default([]).describe("Los productos adjuntos que la persona eligió por tramo") }),
       outputSchema: z.object({ resumen: z.string(), reserva: z.any(), cobro: z.object({ monto: z.string(), moneda: z.string(), modo: z.string(), destinatario: z.object({ nombre: z.string(), addressType: z.string(), address: z.string() }) }) }),
-      execute: ({ ofertaId, modoPago }) => intentar(async () => {
-        const r = await m.reservar(ofertaId, modoPago);
+      execute: ({ ofertaId, modoPago, adjuntos }) => intentar(async () => {
+        const r = await m.reservar(ofertaId, modoPago, adjuntos);
         const cobro = { monto: r.cobro.monto.toFixed(2), moneda: r.cobro.moneda, modo: r.cobro.modo, destinatario: r.cobro.destinatario };
         const pago = r.cobro.modo === "anticipado"
           ? `El cliente le paga a pickagent por belo: ${pesos(r.cobro.monto)} a ${r.cobro.destinatario.nombre} (${r.cobro.destinatario.addressType} ${r.cobro.destinatario.address}); pickagent le liquida después al transportista.`
           : `Se paga contra entrega con belo air: al retirar o entregar, el chofer de ${r.cobro.destinatario.nombre} pide ${pesos(r.cobro.monto)} desde su belo, la persona acerca su teléfono, revisa y confirma; nada que cotizar ahora.`;
-        return { resumen: `Reserva ${r.codigo} con ${r.cobro.destinatario.nombre} (referencia ${r.referencia}${r.etiquetaUrl ? `, etiqueta ${r.etiquetaUrl}` : ""}): retiro ${hora(r.oferta.retiro)}, entrega ${hora(r.oferta.entrega)}. ${pago} Reserva id ${r.id}.`, reserva: r, cobro };
+        return { resumen: `Reserva ${r.codigo} (${r.tramos.length} ${r.tramos.length === 1 ? "tramo" : "tramos"}: ${describirTramos(r)}; referencias ${r.tramos.map((t) => t.referencia).join(", ")}): retiro ${hora(r.oferta.retiro)}, entrega ${hora(r.oferta.entrega)}. ${pago} Reserva id ${r.id}.`, reserva: r, cobro };
       }),
     }),
 
@@ -95,19 +101,20 @@ export function crearServer(m: Motor = motor(almacen(), registroDeEjemplo(), cue
       outputSchema: z.object({ resumen: z.string(), reserva: z.any() }),
       execute: ({ reservaId, transaccionId, monto }) => intentar(async () => {
         const r = await m.marcarPagada(reservaId, transaccionId, monto);
-        return { resumen: `Reserva ${r.codigo} pagada. ${r.oferta.transportista.nombre} retira en ${r.pedido.origen.localidad.nombre} ${hora(r.oferta.retiro)} y entrega en ${r.pedido.destino.localidad.nombre} ${hora(r.oferta.entrega)}. Ahorro por belo: ${pesos(r.oferta.precio - r.oferta.precioBelo)}. Código de seguimiento: ${r.codigo}.`, reserva: r };
+        const puntos = r.tramos.filter((t) => t.puntoDeCobro).length;
+        return { resumen: `Reserva ${r.codigo} pagada. ${r.tramos[0]!.tramo.transportista.nombre} retira en ${r.pedido.origen.localidad.nombre} ${hora(r.oferta.retiro)}; entrega en ${r.pedido.destino.localidad.nombre} ${hora(r.oferta.entrega)} por ${r.tramos.at(-1)!.tramo.transportista.nombre}. Ahorro por belo: ${pesos(r.oferta.precio - r.oferta.precioBelo)}. ${puntos ? `${puntos} ${puntos === 1 ? "traspaso se confirma" : "traspasos se confirman"} en el lugar con punto de cobro (los enlaces son del transportista; están en puntos_de_cobro). ` : ""}Código de seguimiento: ${r.codigo}.`, reserva: r };
       }),
     }),
 
     seguimiento: createTool({
       id: "seguimiento",
-      description: "Estado de una reserva por su código (PA-XXXX) o id, con los hitos del transportista.",
+      description: "Estado de una reserva por su código (PA-XXXX) o id, con sus tramos, los hitos de cada transportista y los traspasos confirmados en el lugar.",
       inputSchema: z.object({ codigo: z.string().min(3) }),
       outputSchema: z.object({ resumen: z.string(), reserva: z.any() }),
       execute: ({ codigo }) => intentar(async () => {
         const r = await m.seguimiento(codigo);
         const hitos = r.hitos.map((h) => `${hora(h.cuando)}: ${estadoLegible[h.estado]}${h.donde ? ` en ${h.donde}` : ""}, ${h.detalle}`).join("; ");
-        return { resumen: `${r.codigo}: ${estadoLegible[r.estado]} (pago ${modoPagoLegible[r.cobro.modo]}). ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre} con ${r.oferta.transportista.nombre}; entrega estimada ${hora(r.oferta.entrega)}. Hitos: ${hitos}.`, reserva: r };
+        return { resumen: `${r.codigo}: ${estadoLegible[r.estado]} (pago ${modoPagoLegible[r.cobro.modo]}). ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre}; ${describirTramos(r)}; entrega estimada ${hora(r.oferta.entrega)}. Hitos: ${hitos}.`, reserva: r };
       }),
     }),
 
@@ -118,19 +125,19 @@ export function crearServer(m: Motor = motor(almacen(), registroDeEjemplo(), cue
       outputSchema: z.object({ resumen: z.string(), reservas: z.array(z.any()) }),
       execute: () => intentar(async () => {
         const rs = await m.reservasPendientesDePago();
-        const lineas = rs.map((r) => `${r.codigo} (id ${r.id}): ${pesos(r.cobro.monto)} ${modoPagoLegible[r.cobro.modo]}, ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre} con ${r.oferta.transportista.nombre}, reservada ${hora(r.creada)}`);
-        return { resumen: rs.length ? `${rs.length} reservas esperando pago:\n${lineas.join("\n")}` : "No hay reservas esperando pago.", reservas: rs.map((r) => ({ id: r.id, codigo: r.codigo, monto: r.cobro.monto.toFixed(2), modo: r.cobro.modo, transportista: r.oferta.transportista.nombre, creada: r.creada })) };
+        const lineas = rs.map((r) => `${r.codigo} (id ${r.id}): ${pesos(r.cobro.monto)} ${modoPagoLegible[r.cobro.modo]}, ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre} con ${r.tramos.map((t) => t.tramo.transportista.nombre).join(" + ")}, reservada ${hora(r.creada)}`);
+        return { resumen: rs.length ? `${rs.length} reservas esperando pago:\n${lineas.join("\n")}` : "No hay reservas esperando pago.", reservas: rs.map((r) => ({ id: r.id, codigo: r.codigo, monto: r.cobro.monto.toFixed(2), modo: r.cobro.modo, transportista: r.tramos.map((t) => t.tramo.transportista.nombre).join(" + "), creada: r.creada })) };
       }),
     }),
 
     liquidaciones: createTool({
       id: "liquidaciones",
-      description: "Lado de pickagent: lo que pickagent y cada transportista se deben por las reservas pagadas y no liquidadas, neteado. Saldo positivo: pickagent le transfiere al transportista (a su belotag o CVU); negativo: el transportista le debe a pickagent la comisión de lo que cobró en mano con belo air.",
+      description: "Lado de pickagent: lo que pickagent y cada transportista se deben por los tramos pagados sin punto de cobro, neteado (los tramos con punto de cobro se liquidan solos cuando Spotme confirma el pago). Saldo positivo: pickagent le transfiere al transportista (a su belotag o CVU); negativo: el transportista le debe a pickagent la comisión de lo que cobró en mano con belo air.",
       inputSchema: z.object({}),
       outputSchema: z.object({ resumen: z.string(), liquidaciones: z.array(z.any()) }),
       execute: () => intentar(async () => {
         const ls = await m.liquidaciones();
-        const lineas = ls.map((l) => `${l.transportista.nombre}: ${l.reservas.length} reservas (${l.reservas.join(", ")}), a pagar ${pesos(l.aPagar)}, a cobrar ${pesos(l.aCobrar)}, saldo ${pesos(l.saldo)} → ${l.saldo > 0 ? `transferir ${pesos(l.saldo)} a ${l.transportista.cobro.addressType} ${l.transportista.cobro.address}` : l.saldo < 0 ? `el transportista le debe ${pesos(-l.saldo)} a pickagent` : "nada que mover"} (id ${l.transportista.id})`);
+        const lineas = ls.map((l) => `${l.transportista.nombre}: ${l.reservas.length} tramos (${l.reservas.join(", ")}), a pagar ${pesos(l.aPagar)}, a cobrar ${pesos(l.aCobrar)}, saldo ${pesos(l.saldo)} → ${l.saldo > 0 ? `transferir ${pesos(l.saldo)} a ${l.transportista.cobro.addressType} ${l.transportista.cobro.address}` : l.saldo < 0 ? `el transportista le debe ${pesos(-l.saldo)} a pickagent` : "nada que mover"} (id ${l.transportista.id})`);
         return { resumen: ls.length ? `Liquidaciones pendientes:\n${lineas.join("\n")}` : "No hay reservas pendientes de liquidación.", liquidaciones: ls };
       }),
     }),
@@ -143,6 +150,18 @@ export function crearServer(m: Motor = motor(almacen(), registroDeEjemplo(), cue
       execute: ({ transportistaId, transaccionId }) => intentar(async () => {
         const r = await m.marcarLiquidada(transportistaId, transaccionId);
         return { resumen: `Liquidadas ${r.reservas.length} reservas con ${r.transportista} (${r.reservas.join(", ")}), saldo ${pesos(r.saldo)}.` };
+      }),
+    }),
+
+    puntos_de_cobro: createTool({
+      id: "puntos_de_cobro",
+      description: "Lado de pickagent: los puntos de cobro de Spotme de las reservas pagadas, uno por traspaso con transportista que cobra por CVU: enlace y código para dárselos al transportista (nunca al cliente), neto a liberar, y si el chofer ya lo reclamó o ya se pagó.",
+      inputSchema: z.object({}),
+      outputSchema: z.object({ resumen: z.string(), puntos: z.array(z.any()) }),
+      execute: () => intentar(async () => {
+        const ps = await m.listarPuntosDeCobro();
+        const lineas = ps.map((p) => `${p.reserva} tramo ${p.tramo} · ${p.transportista}: ${pesos(p.neto)} · enlace ${p.enlace} · código ${p.codigo} · ${p.pagado ? "pagado" : p.reclamadoEn ? `reclamado ${hora(p.reclamadoEn)}, esperando aprobación de pickagent en Spotme` : "pendiente de reclamo"}`);
+        return { resumen: ps.length ? `Puntos de cobro:\n${lineas.join("\n")}` : "No hay puntos de cobro.", puntos: ps };
       }),
     }),
 

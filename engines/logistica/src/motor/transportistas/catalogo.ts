@@ -24,6 +24,8 @@ export interface Servicio {
   velocidadKmh: number;
   /** Horas fijas de carga y descarga. */
   horasOperativas?: number;
+  /** Entrega en el depósito del transportista en destino: el motor le suma una última milla. */
+  deposito?: { destino: boolean };
 }
 
 export interface DatosDeCatalogo {
@@ -88,7 +90,7 @@ export function transportistaPorCatalogo(datos: DatosDeCatalogo): Transportista 
         const entrega = new Date(retiro.getTime() + horasViaje * 3600_000);
         if (entrega > limite) continue;
         const precio = Math.round(Math.max(s.tarifa.minimo ?? 0, s.tarifa.base + s.tarifa.porKm * km + s.tarifa.porKg * pedido.pesoKg));
-        cotizaciones.push({ referencia: s.id, servicio: s.nombre, vehiculo: s.vehiculo, distanciaKm: km, horasViaje, retiro: retiro.toISOString(), entrega: entrega.toISOString(), moneda: "ARS", precio });
+        cotizaciones.push({ referencia: s.id, servicio: s.nombre, vehiculo: s.vehiculo, distanciaKm: km, horasViaje, retiro: retiro.toISOString(), entrega: entrega.toISOString(), moneda: "ARS", precio, ...(s.deposito?.destino ? { entregaEnDeposito: true, condiciones: ["entrega en el depósito del transportista en destino"] } : {}) });
       }
       return cotizaciones;
     },

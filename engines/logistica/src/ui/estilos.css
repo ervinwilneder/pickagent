@@ -123,3 +123,8 @@ code, .codigo { font-family: var(--mono); font-size: 12px; word-break: break-all
 .oferta .acciones { grid-column: 1 / -1; }
 
 @media (max-width: 420px) { .grande { font-size: 28px; } .cuerpo { padding: 14px; } .oferta { grid-template-columns: 1fr; } .oferta .precios { justify-items: start; text-align: left; } }
+
+/* Tramos y adjuntos de una oferta */
+.tramo { border-top: 1px solid var(--linea); padding-top: 6px; margin-top: 6px; display: grid; gap: 3px; }
+.adjunto { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; font-size: 12.5px; cursor: pointer; }
+.adjunto input { accent-color: var(--ambar); }

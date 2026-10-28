@@ -1,0 +1,8 @@
+node_modules/
+.mastra/
+*.db
+*.db-*
+.env
+.env.*
+.vercel/
+dist/

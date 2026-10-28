@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>pickagent · envíos resueltos por un agente, pagados con belo</title>
+  <meta name="description" content="pickagent agrega transportistas, cotiza, reserva y cobra por belo. Le contás qué tenés que mandar y el agente hace el resto.">
+  <link rel="stylesheet" href="/src/landing.css">
+</head>
+<body>
+  <header class="ancho barra">
+    <a class="marca" href="/">pickagent</a>
+    <nav>
+      <a class="oculto-chico" href="#como">Cómo funciona</a>
+      <a class="oculto-chico" href="#transportistas">Transportistas</a>
+      <a class="oculto-chico" href="#belo">Con belo</a>
+      <a class="boton primario" href="/app.html?agente=asistente">Probar la demo</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="ancho hero">
+      <div class="texto">
+        <p class="eyebrow">Logística agregada · pagos con belo</p>
+        <h1>Decile qué mandar. pickagent lo resuelve y lo cobra.</h1>
+        <p class="bajada">Un agente que junta lo que falta, consulta a todos los transportistas, te muestra las mejores ofertas con el precio pagando con belo, reserva y confirma solo cuando entra el pago.</p>
+        <div class="acciones">
+          <a class="boton primario" href="/app.html?agente=asistente">Probar como cliente</a>
+          <a class="boton" href="/app.html?agente=pickagent">Ver el agente de pickagent</a>
+        </div>
+        <p class="nota">MCP Apps + MCP Events · Buildathon 001 de belo · Buenos Aires</p>
+      </div>
+      <div class="muestra" aria-label="Ejemplo de conversación">
+        <div class="cabecera"><span>mi asistente · belo conectado</span><span class="vivo">en vivo</span></div>
+        <div class="burbuja vos">Tengo que mandar 20 cajas de repuestos, 120 kg, de Villa Crespo a Rosario antes del viernes a las 10. Es frágil.</div>
+        <div class="burbuja agente">Consulté a cinco transportistas. La mejor con belo:</div>
+        <div class="oferta mejor">
+          <span class="quien">Ruta Pampa</span><span class="precio">$ 206.131</span>
+          <span class="detalle">retira jueves 9 a 12 · entrega viernes antes de las 10 · frágil ok</span><span class="lista">$ 234.240</span>
+        </div>
+        <div class="burbuja agente">Ahorrás $ 28.109 pagando con belo. ¿Reservo y te paso la aprobación?</div>
+        <div class="burbuja vos">Dale.</div>
+        <div class="evento">pago recibido · reserva PA-RTXA confirmada · seguimiento RP-88213</div>
+      </div>
+    </section>
+
+    <section class="ancho" id="como">
+      <div class="encabezado">
+        <h2>Cómo funciona un envío</h2>
+        <p>Cuatro pasos, sin salir de la conversación. Las vistas aparecen dentro del chat, en la pantalla de pickagent o en Claude.</p>
+      </div>
+      <ol class="pasos">
+        <li><h3>Contás el envío</h3><p>Qué, de dónde a dónde, para cuándo. El formulario se abre precargado y solo pide lo que falta: peso, volumen, cuidados, contacto.</p></li>
+        <li><h3>El motor cotiza a todos</h3><p>Fletes por catálogo y empresas conectadas por API, en paralelo. Hasta cinco ofertas con retiro y entrega estimados.</p></li>
+        <li><h3>Elegís y pagás</h3><p>Precio de lista y precio con belo. Transferís a pickagent con la aprobación de belo o pagás contra entrega con belo air.</p></li>
+        <li><h3>Se confirma solo</h3><p>El evento de belo avisa que entró el pago. pickagent lo cruza con tu reserva, la marca pagada y te da el seguimiento.</p></li>
+      </ol>
+    </section>
+
+    <section class="ancho" id="transportistas">
+      <div class="encabezado">
+        <h2>Los transportistas se suman sin fricción</h2>
+        <p>Un motor de agregación simple y robusto: dos formas de entrar, un mismo dominio de pedidos, ofertas, reservas y seguimiento.</p>
+      </div>
+      <div class="tarjetas">
+        <div class="tarjeta"><h3>Por catálogo</h3><p>Cargás tus servicios: vehículo, cobertura, tarifa (base, por km, por kg, mínimo), capacidad, ventana de retiro y cuidados. pickagent cotiza por vos.</p><span class="mono">sin API · fletes y camiones</span></div>
+        <div class="tarjeta"><h3>Conectado por API</h3><p>Implementás tres llamadas en tus términos: cotizar, crear el envío, seguirlo. El motor traduce y aísla fallas. Así entran Andreani y Pickit.</p><span class="mono">cotizar · crear · seguir</span></div>
+        <div class="tarjeta"><h3>Cobrás por belo, sin gestionar cobros</h3><p>El cliente le paga a pickagent. pickagent te liquida por detrás, desde su belo, lo cobrado menos su comisión: un proceso de fondo que el cliente nunca ve.</p><span class="mono">neto = precio con belo − comisión</span></div>
+      </div>
+    </section>
+
+    <section class="ancho" id="belo">
+      <div class="encabezado">
+        <h2>Qué cambia cuando conectás tu belo</h2>
+        <p>El asistente consigue el envío igual. Con belo conectado, consigue el mejor precio y se ocupa del pago de punta a punta.</p>
+      </div>
+      <div class="comparativa">
+        <div class="columna">
+          <span class="chip">sin belo</span>
+          <h3>Vos pagás por tu cuenta</h3>
+          <ul>
+            <li>Precio de lista</li>
+            <li>Te deja el CVU y el monto; transferís desde tu banco</li>
+            <li>La reserva queda pendiente hasta que alguien vea el pago</li>
+          </ul>
+        </div>
+        <div class="columna con">
+          <span class="chip">con belo</span>
+          <h3>El asistente cobra y confirma</h3>
+          <ul>
+            <li><b>Precio con belo</b>: el descuento del transportista, siempre a la vista</li>
+            <li><b>Pago en un paso</b>: cotiza el monto exacto y te muestra la aprobación de belo</li>
+            <li><b>Confirmación automática</b>: el pago dispara la reserva sin que nadie pregunte</li>
+            <li><b>Contra entrega con belo air</b>: el chofer pide el monto acercando el teléfono; aprobás y listo, sin efectivo</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="ancho">
+      <div class="cierre">
+        <h2>Probá el flujo completo</h2>
+        <p>La demo corre con la cuenta de ejemplo de belo: el pago y el evento pasan de verdad, sin mover plata real.</p>
+        <div class="acciones">
+          <a class="boton primario" href="/app.html?agente=asistente">Abrir mi asistente</a>
+          <a class="boton" href="/app.html?agente=pickagent">Abrir pickagent</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ancho">
+    <span>pickagent · hecho en el Buildathon 001 de belo</span>
+    <span class="mono">motor de logística · MCP de belo · agentes Mastra · MCP Apps + Events</span>
+  </footer>
+</body>
+</html>

@@ -27,7 +27,9 @@ export function beloRest(config: ConfigRest): BeloPort {
   function ok<T>(r: { data?: T; error?: unknown; response: Response }): T {
     if (r.error !== undefined || r.data === undefined) {
       const e = (r.error as { error?: { code?: string; type?: string; message?: string } })?.error;
-      throw new BeloError(e?.code ?? `http_${r.response.status}`, e?.type ?? "api_error", e?.message ?? r.response.statusText);
+      // Sin cuerpo JSON (por ejemplo, un bloqueo de Cloudflare) se explica por el HTTP.
+      const bloqueo = r.response.status === 403 && !e ? "belo no acepta pedidos desde esta red o este servidor." : null;
+      throw new BeloError(e?.code ?? `http_${r.response.status}`, e?.type ?? "api_error", e?.message ?? bloqueo ?? `belo respondió ${r.response.status}.`);
     }
     return r.data;
   }

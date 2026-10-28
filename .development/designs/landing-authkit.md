@@ -34,6 +34,15 @@ de la aprobación. No se agregan métricas, clientes, precios ni capacidades.
 - Foco, selección, contraste y preferencias de movimiento/transparencia se
   conservan. Se comprueban escritorio y móvil, navegación y enlace al chat.
 
+## Ajustes de la conversación
+
+Los diálogos tienen burbujas con una cola hacia cada emisor: cliente a la
+derecha y agente a la izquierda. Se eliminan la introducción «Esta es la mejor
+opción pagando con belo» y la etiqueta «Precio con belo» de la oferta del
+ejemplo. La confirmación usa verde de éxito en el ícono y el mensaje, con el
+seguimiento debajo. Los importes, el orden del pago y el contenido restante
+conservan su significado.
+
 La entrega sigue la ruta de código acordada en este chat: commit en `main`.
 Los dominios publicados pertenecen a un equipo de Vercel que no está conectado
 a esta sesión; un push no confirma por sí solo que el sitio público cambió.

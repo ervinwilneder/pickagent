@@ -30,25 +30,27 @@ h3 { font-size: 21px; line-height: 1.35; letter-spacing: -.02em; }
 .muestra .cabecera { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; padding: 20px 24px; border-bottom: 1px solid var(--linea); border-image: var(--divisor-horizontal) 1; font: 500 18px/1.4 var(--display); }
 .meta { color: var(--tenue); font: 400 12px/1.5 var(--texto); }
 .conversacion { display: grid; gap: 20px; padding: 24px; }
-.burbuja { max-width: 95%; font-size: 14.4px; line-height: 1.65; }
-.burbuja.vos { justify-self: end; padding: 12px 16px; border-radius: 12px; background: #bad6f714; }
-.burbuja.agente { color: #c7d3ea; }
-.burbuja.breve { max-width: 100%; }
+.burbuja { position: relative; width: fit-content; max-width: calc(100% - 14px); padding: 12px 16px; border-radius: 16px; background: var(--fondo-burbuja); font-size: 14.4px; line-height: 1.65; }
+.burbuja::after { content: ""; position: absolute; bottom: 0; width: 12px; height: 14px; background: var(--fondo-burbuja); }
+.burbuja.vos { --fondo-burbuja: #202431; justify-self: end; margin-right: 7px; border-bottom-right-radius: 4px; }
+.burbuja.vos::after { right: -7px; clip-path: polygon(0 0, 100% 100%, 0 100%); }
+.burbuja.agente { --fondo-burbuja: #151b27; justify-self: start; margin-left: 7px; border-bottom-left-radius: 4px; color: #c7d3ea; }
+.burbuja.agente::after { left: -7px; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
 .oferta { padding-block: 18px; border-top: 1px solid var(--linea-control); border-bottom: 1px solid var(--linea-control); border-image: var(--divisor-horizontal) 1; }
 .oferta-cabecera, .oferta-precio { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
 .quien { font-size: 15px; font-weight: 500; color: var(--hielo); }
-.etiqueta { color: var(--tenue); font-size: 12px; }
 .oferta-precio { margin-top: 12px; }
 .oferta-precio strong { color: var(--hielo); font: 500 36px/1.2 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
 .oferta-precio small { font: 400 13px/1.5 var(--texto); letter-spacing: normal; }
 .oferta-precio s { color: var(--tenue); font-size: 14.4px; font-variant-numeric: tabular-nums; }
 .detalle { margin-top: 14px; color: var(--tenue); font-size: 12.5px; line-height: 1.7; }
 .ahorro { margin-top: 8px; color: #c7d3ea; font-size: 13.2px; }
-.evento { display: flex; align-items: flex-start; gap: 12px; color: var(--hielo); font-size: 13.2px; }
-.evento > span { padding-top: 2px; }
+.evento { display: flex; align-items: flex-start; gap: 12px; color: var(--exito); font-size: 13.2px; }
+.evento > span { padding-top: 1px; }
+.evento svg { width: 20px; height: 20px; }
 .evento strong { display: block; font-weight: 500; }
-.evento div > span { display: block; margin-top: 3px; color: var(--tenue); font-size: 12px; }
-.evento code { color: #c7d3ea; font: 11px/1.5 var(--mono); }
+.evento div > span { display: block; margin-top: 3px; color: #a2c6b3; font-size: 12px; }
+.evento code { color: inherit; font: 11px/1.5 var(--mono); }
 
 /* Secuencias y listas abiertas: el contenido lleva la jerarquía. */
 .seccion { padding-block: 88px; border-top: 1px solid var(--linea); border-image: var(--divisor-horizontal) 1; scroll-margin-top: 24px; }
@@ -107,7 +109,6 @@ h3 { font-size: 21px; line-height: 1.35; letter-spacing: -.02em; }
   .acciones { gap: 8px 24px; }
   .muestra .cabecera { padding: 18px; }
   .conversacion { padding: 18px; gap: 18px; }
-  .burbuja { max-width: 100%; }
   .oferta-precio strong { font-size: 33px; }
   .seccion { padding-block: 56px; }
   .encabezado { gap: 16px; }
@@ -129,4 +130,4 @@ h3 { font-size: 21px; line-height: 1.35; letter-spacing: -.02em; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .hero { animation: none; } }
 @media (prefers-reduced-transparency: reduce) { .muestra { background: var(--papel); backdrop-filter: none; } body::before { display: none; } }
-@media (forced-colors: active) { body::before { display: none; } .boton { border: 1px solid ButtonText; } .barra, .cabecera, .seccion, .oferta, .beneficios > div, .integraciones article, .liquidacion, .pie-landing { border-image: none; } }
+@media (forced-colors: active) { body::before, .burbuja::after { display: none; } .boton { border: 1px solid ButtonText; } .burbuja { border: 1px solid CanvasText; } .barra, .cabecera, .seccion, .oferta, .beneficios > div, .integraciones article, .liquidacion, .pie-landing { border-image: none; } }

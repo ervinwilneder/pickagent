@@ -1,0 +1,35 @@
+{
+  "name": "logistica",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build:ui": "for f in src/ui/*.html; do cross-env INPUT=$f vite build || exit 1; done && date -u +%Y%m%d%H%M%S > dist/version",
+    "build": "npm run typecheck && npm run build:ui",
+    "serve": "tsx main.ts",
+    "dev": "cross-env NODE_ENV=development concurrently \"npm run build:ui -- --watch\" \"tsx --watch main.ts\""
+  },
+  "dependencies": {
+    "@mastra/core": "^1.79.0",
+    "@mastra/mcp": "^2.6.0",
+    "@modelcontextprotocol/client": "^2.4.0",
+    "@modelcontextprotocol/ext-apps": "^2.0.3",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "concurrently": "^10.0.6",
+    "cross-env": "^10.1.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5",
+    "vite-plugin-singlefile": "^2.3.4"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

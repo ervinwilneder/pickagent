@@ -18,11 +18,15 @@ import { eventos, resumir } from "./src/eventos.ts";
 import { deConversion, dePix, deTransferencia } from "./src/operacion.ts";
 
 const vista = (nombre: string) => fs.readFileSync(path.join(process.cwd(), "dist", `${nombre}.html`), "utf-8");
+
+// Los hosts cachean los recursos ui:// por URI: cada build cambia la URI para
+// que una vista nueva se vea sin reconectar el conector.
+const VERSION = fs.existsSync(path.join(process.cwd(), "dist", "version")) ? fs.readFileSync(path.join(process.cwd(), "dist", "version"), "utf-8").trim() : "dev";
 const UI = {
-  cuenta: "ui://belo/cuenta.html",
-  operacion: "ui://belo/operacion.html",
-  contactos: "ui://belo/contactos.html",
-  depositar: "ui://belo/depositar.html",
+  cuenta: `ui://belo/${VERSION}/cuenta.html`,
+  operacion: `ui://belo/${VERSION}/operacion.html`,
+  contactos: `ui://belo/${VERSION}/contactos.html`,
+  depositar: `ui://belo/${VERSION}/depositar.html`,
 };
 
 /** Un error de belo se cuenta en términos del producto, nunca con su código. */

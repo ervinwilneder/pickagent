@@ -107,6 +107,18 @@ export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemp
       }),
     }),
 
+    reservas_pendientes: createTool({
+      id: "reservas_pendientes",
+      description: "Lado de pickagent: las reservas que esperan un pago, con código, id, monto, modo y a quién se le paga. Cuando entra un depósito en la cuenta de pickagent, buscá acá la reserva con ese monto y marcala pagada.",
+      inputSchema: z.object({}),
+      outputSchema: z.object({ resumen: z.string(), reservas: z.array(z.any()) }),
+      execute: () => intentar(async () => {
+        const rs = await m.reservasPendientesDePago();
+        const lineas = rs.map((r) => `${r.codigo} (id ${r.id}): ${pesos(r.cobro.monto)} ${modoPagoLegible[r.cobro.modo]}, ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre} con ${r.oferta.transportista.nombre}, reservada ${hora(r.creada)}`);
+        return { resumen: rs.length ? `${rs.length} reservas esperando pago:\n${lineas.join("\n")}` : "No hay reservas esperando pago.", reservas: rs.map((r) => ({ id: r.id, codigo: r.codigo, monto: r.cobro.monto.toFixed(2), modo: r.cobro.modo, transportista: r.oferta.transportista.nombre, creada: r.creada })) };
+      }),
+    }),
+
     liquidaciones: createTool({
       id: "liquidaciones",
       description: "Lado de pickagent: lo que pickagent y cada transportista se deben por las reservas pagadas y no liquidadas, neteado. Saldo positivo: pickagent le transfiere al transportista (a su belotag o CVU); negativo: el transportista le debe a pickagent la comisión de lo que cobró en mano con belo air.",

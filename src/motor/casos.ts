@@ -151,6 +151,11 @@ export function motor(almacen: Almacen, registro: Registro, pickagent: CuentaPic
     return r;
   }
 
+  /** Las reservas que esperan un pago: para cruzarlas con lo que entra en la cuenta de pickagent. */
+  async function reservasPendientesDePago(): Promise<Reserva[]> {
+    return (await almacen.reservas()).filter((r) => r.estado === "reservada");
+  }
+
   /** Lo que pickagent y cada transportista se deben por las reservas pagadas y no liquidadas, neteado. */
   async function liquidaciones(): Promise<{ transportista: { id: string; nombre: string; cobro: Transportista["cobro"] }; reservas: string[]; aPagar: number; aCobrar: number; saldo: number }[]> {
     const porTransportista = new Map<string, { reservas: string[]; aPagar: number; aCobrar: number }>();
@@ -199,6 +204,7 @@ export function motor(almacen: Almacen, registro: Registro, pickagent: CuentaPic
     reservar,
     marcarPagada,
     seguimiento,
+    reservasPendientesDePago,
     liquidaciones,
     marcarLiquidada,
     cargarServicio,

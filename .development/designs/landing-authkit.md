@@ -46,6 +46,14 @@ conservan su significado.
 El precio principal y su moneda usan el violeta de marca en una variante
 clara para texto sobre fondo oscuro, con contraste suficiente también en ARS.
 
+## Imagen de envíos y pagos
+
+La ilustración provista por Lucas acompaña «El envío y el pago, en el mismo
+lugar», debajo del texto introductorio y al lado de los beneficios en
+escritorio. Se conserva completa, con su transparencia y proporción original,
+sin marco. En móvil queda entre la introducción y los beneficios, dentro del
+ancho disponible. Tiene descripción alternativa y carga diferida.
+
 La entrega sigue la ruta de código acordada en este chat: commit en `main`.
 Los dominios publicados pertenecen a un equipo de Vercel que no está conectado
 a esta sesión; un push no confirma por sí solo que el sitio público cambió.

@@ -23,7 +23,14 @@ const intentar = async <T>(f: () => Promise<T>): Promise<T> => f().catch(explica
 const pesos = (n: number) => `${n.toLocaleString("es-AR")} ARS`;
 const hora = (iso: string) => new Date(iso).toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
 
-export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemplo())) {
+/** La cuenta de belo de pickagent, a la que paga el cliente. Sin default: sale de la configuración. */
+function cuentaPickagent() {
+  const belotag = process.env.PICKAGENT_BELOTAG;
+  if (!belotag) throw new Error("Configurá PICKAGENT_BELOTAG (el belotag de la cuenta de belo de pickagent)");
+  return { nombre: process.env.PICKAGENT_NOMBRE ?? "pickagent", belotag, cvu: process.env.PICKAGENT_CVU, comision: Number(process.env.PICKAGENT_COMISION ?? "0.08") };
+}
+
+export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemplo(), cuentaPickagent())) {
   const tools = {
     pedido_envio: createTool({
       id: "pedido_envio",
@@ -64,14 +71,14 @@ export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemp
 
     reservar: createTool({
       id: "reservar",
-      description: "Reserva una oferta elegida por la persona con el transportista y devuelve el cobro: cuánto (ya con el descuento por belo), en qué moneda, a quién pagarle por belo (belotag o CVU del transportista) y el modo. Modo 'anticipado': cotizá la transferencia en belo por ese monto, mostrásela a la persona y, cuando apruebe, confirmá y marcá la reserva como pagada. Modo 'contra_entrega_belo_air' (solo si la oferta lo acepta): al retirar o entregar, el chofer pide el monto exacto desde su belo con belo air, la persona acerca su teléfono, revisa y confirma, y la plata llega al instante; no cotices nada; cuando llegue el movimiento de belo, marcá la reserva pagada.",
+      description: "Reserva una oferta elegida por la persona con el transportista y devuelve el cobro: cuánto (ya con el descuento por belo), en qué moneda, a quién pagarle y el modo. Modo 'anticipado': el cliente le paga a pickagent (su belotag); cotizá la transferencia en belo por ese monto, mostrásela a la persona y, cuando apruebe, confirmá. pickagent marca la reserva pagada cuando ve entrar el pago en su cuenta. Modo 'contra_entrega_belo_air' (solo si la oferta lo acepta): al retirar o entregar, el chofer pide el monto exacto desde su belo con belo air, la persona acerca su teléfono, revisa y confirma, y la plata llega al instante; no cotices nada; cuando llegue el movimiento de belo, marcá la reserva pagada.",
       inputSchema: z.object({ ofertaId: z.string().uuid(), modoPago: z.enum(["anticipado", "contra_entrega_belo_air"]).default("anticipado") }),
       outputSchema: z.object({ resumen: z.string(), reserva: z.any(), cobro: z.object({ monto: z.string(), moneda: z.string(), modo: z.string(), destinatario: z.object({ nombre: z.string(), addressType: z.string(), address: z.string() }) }) }),
       execute: ({ ofertaId, modoPago }) => intentar(async () => {
         const r = await m.reservar(ofertaId, modoPago);
         const cobro = { monto: r.cobro.monto.toFixed(2), moneda: r.cobro.moneda, modo: r.cobro.modo, destinatario: r.cobro.destinatario };
         const pago = r.cobro.modo === "anticipado"
-          ? `A pagar por belo: ${pesos(r.cobro.monto)} a ${r.cobro.destinatario.nombre} (${r.cobro.destinatario.addressType} ${r.cobro.destinatario.address}).`
+          ? `El cliente le paga a pickagent por belo: ${pesos(r.cobro.monto)} a ${r.cobro.destinatario.nombre} (${r.cobro.destinatario.addressType} ${r.cobro.destinatario.address}); pickagent le liquida después al transportista.`
           : `Se paga contra entrega con belo air: al retirar o entregar, el chofer de ${r.cobro.destinatario.nombre} pide ${pesos(r.cobro.monto)} desde su belo, la persona acerca su teléfono, revisa y confirma; nada que cotizar ahora.`;
         return { resumen: `Reserva ${r.codigo} con ${r.cobro.destinatario.nombre} (referencia ${r.referencia}${r.etiquetaUrl ? `, etiqueta ${r.etiquetaUrl}` : ""}): retiro ${hora(r.oferta.retiro)}, entrega ${hora(r.oferta.entrega)}. ${pago} Reserva id ${r.id}.`, reserva: r, cobro };
       }),
@@ -97,6 +104,29 @@ export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemp
         const r = await m.seguimiento(codigo);
         const hitos = r.hitos.map((h) => `${hora(h.cuando)}: ${estadoLegible[h.estado]}${h.donde ? ` en ${h.donde}` : ""}, ${h.detalle}`).join("; ");
         return { resumen: `${r.codigo}: ${estadoLegible[r.estado]} (pago ${modoPagoLegible[r.cobro.modo]}). ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre} con ${r.cobro.destinatario.nombre}; entrega estimada ${hora(r.oferta.entrega)}. Hitos: ${hitos}.`, reserva: r };
+      }),
+    }),
+
+    liquidaciones: createTool({
+      id: "liquidaciones",
+      description: "Lado de pickagent: lo que pickagent y cada transportista se deben por las reservas pagadas y no liquidadas, neteado. Saldo positivo: pickagent le transfiere al transportista (a su belotag o CVU); negativo: el transportista le debe a pickagent la comisión de lo que cobró en mano con belo air.",
+      inputSchema: z.object({}),
+      outputSchema: z.object({ resumen: z.string(), liquidaciones: z.array(z.any()) }),
+      execute: () => intentar(async () => {
+        const ls = await m.liquidaciones();
+        const lineas = ls.map((l) => `${l.transportista.nombre}: ${l.reservas.length} reservas (${l.reservas.join(", ")}), a pagar ${pesos(l.aPagar)}, a cobrar ${pesos(l.aCobrar)}, saldo ${pesos(l.saldo)} → ${l.saldo > 0 ? `transferir ${pesos(l.saldo)} a ${l.transportista.cobro.addressType} ${l.transportista.cobro.address}` : l.saldo < 0 ? `el transportista le debe ${pesos(-l.saldo)} a pickagent` : "nada que mover"} (id ${l.transportista.id})`);
+        return { resumen: ls.length ? `Liquidaciones pendientes:\n${lineas.join("\n")}` : "No hay reservas pendientes de liquidación.", liquidaciones: ls };
+      }),
+    }),
+
+    marcar_liquidada: createTool({
+      id: "marcar_liquidada",
+      description: "Lado de pickagent: salda las reservas pendientes de un transportista con el id de la transacción de belo que las pagó.",
+      inputSchema: z.object({ transportistaId: z.string(), transaccionId: z.string() }),
+      outputSchema: z.object({ resumen: z.string() }),
+      execute: ({ transportistaId, transaccionId }) => intentar(async () => {
+        const r = await m.marcarLiquidada(transportistaId, transaccionId);
+        return { resumen: `Liquidadas ${r.reservas.length} reservas con ${r.transportista} (${r.reservas.join(", ")}), saldo ${pesos(r.saldo)}.` };
       }),
     }),
 

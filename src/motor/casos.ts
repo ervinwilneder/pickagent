@@ -3,8 +3,9 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { Cuidado, ModoPago, Oferta, Pedido, Punto, Reserva } from "./dominio.ts";
 import { localidad, localidades } from "./localidades.ts";
-import type { Almacen, Contexto } from "./puerto.ts";
+import type { Almacen, Contexto, CuentaPickagent } from "./puerto.ts";
 import type { Servicio } from "./transportistas/catalogo.ts";
+import type { Transportista } from "./puerto.ts";
 import type { Registro } from "./transportistas/registro.ts";
 
 export class ErrorDeLogistica extends Error {
@@ -39,7 +40,7 @@ function punto(texto: string, direccion: string | undefined, rol: "origen" | "de
   return { texto: texto.trim(), localidad: l, direccion: direccion?.trim() || undefined };
 }
 
-export function motor(almacen: Almacen, registro: Registro, ahora: () => Date = () => new Date()) {
+export function motor(almacen: Almacen, registro: Registro, pickagent: CuentaPickagent, ahora: () => Date = () => new Date()) {
   const contexto = (): Contexto => ({ ahora: ahora() });
 
   async function crearPedido(entrada: unknown): Promise<Pedido> {
@@ -95,6 +96,9 @@ export function motor(almacen: Almacen, registro: Registro, ahora: () => Date = 
     const r = await transportista.reservar(pedido, oferta, contexto()).catch((e) => {
       throw new ErrorDeLogistica("reserva_fallida", `${transportista.nombre} no pudo tomar la reserva: ${e instanceof Error ? e.message : e}`);
     });
+    const comision = Math.round(oferta.precioBelo * pickagent.comision);
+    const neto = oferta.precioBelo - comision;
+    const cobraPickagent = modoPago === "anticipado";
     const reserva: Reserva = {
       id: randomUUID(),
       codigo: `PA-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
@@ -103,7 +107,10 @@ export function motor(almacen: Almacen, registro: Registro, ahora: () => Date = 
       oferta,
       referencia: r.referencia,
       etiquetaUrl: r.etiquetaUrl,
-      cobro: { monto: oferta.precioBelo, moneda: "ARS", modo: modoPago, destinatario: { ...transportista.cobro, nombre: transportista.nombre } },
+      cobro: cobraPickagent
+        ? { monto: oferta.precioBelo, moneda: "ARS", modo: modoPago, cobradoPor: "pickagent", destinatario: { nombre: pickagent.nombre, addressType: "BELOTAG", address: pickagent.belotag } }
+        : { monto: oferta.precioBelo, moneda: "ARS", modo: modoPago, cobradoPor: "transportista", destinatario: { ...transportista.cobro, nombre: transportista.nombre } },
+      liquidacion: { transportistaId: transportista.id, comision, neto, aPagarAlTransportista: cobraPickagent ? neto : 0, aCobrarAlTransportista: cobraPickagent ? 0 : comision, estado: "pendiente" },
       hitos: r.hitos ?? [{ cuando: ahora().toISOString(), estado: "reservada", detalle: `Reserva tomada por ${transportista.nombre}` }],
       creada: ahora().toISOString(),
       actualizada: ahora().toISOString(),
@@ -144,6 +151,41 @@ export function motor(almacen: Almacen, registro: Registro, ahora: () => Date = 
     return r;
   }
 
+  /** Lo que pickagent y cada transportista se deben por las reservas pagadas y no liquidadas, neteado. */
+  async function liquidaciones(): Promise<{ transportista: { id: string; nombre: string; cobro: Transportista["cobro"] }; reservas: string[]; aPagar: number; aCobrar: number; saldo: number }[]> {
+    const porTransportista = new Map<string, { reservas: string[]; aPagar: number; aCobrar: number }>();
+    for (const r of await almacen.reservas()) {
+      if (r.estado === "reservada" || r.estado === "cancelada" || r.liquidacion.estado !== "pendiente") continue;
+      const acc = porTransportista.get(r.liquidacion.transportistaId) ?? { reservas: [], aPagar: 0, aCobrar: 0 };
+      acc.reservas.push(r.codigo);
+      acc.aPagar += r.liquidacion.aPagarAlTransportista;
+      acc.aCobrar += r.liquidacion.aCobrarAlTransportista;
+      porTransportista.set(r.liquidacion.transportistaId, acc);
+    }
+    return [...porTransportista].flatMap(([id, acc]) => {
+      const t = registro.por(id);
+      return t ? [{ transportista: { id: t.id, nombre: t.nombre, cobro: t.cobro }, reservas: acc.reservas, aPagar: acc.aPagar, aCobrar: acc.aCobrar, saldo: acc.aPagar - acc.aCobrar }] : [];
+    });
+  }
+
+  /** Salda las reservas pendientes de un transportista con la transacción de belo que las pagó (o cobró). */
+  async function marcarLiquidada(transportistaId: string, transaccionId: string): Promise<{ transportista: string; reservas: string[]; saldo: number }> {
+    const t = registro.por(transportistaId);
+    if (!t) throw new ErrorDeLogistica("transportista_desconocido", "Ese transportista no existe.");
+    const codigos: string[] = [];
+    let saldo = 0;
+    for (const r of await almacen.reservas()) {
+      if (r.liquidacion.transportistaId !== transportistaId || r.liquidacion.estado !== "pendiente" || r.estado === "reservada" || r.estado === "cancelada") continue;
+      r.liquidacion = { ...r.liquidacion, estado: "liquidada", transaccionId, cuando: ahora().toISOString() };
+      r.hitos.push({ cuando: ahora().toISOString(), estado: r.estado, detalle: `Liquidada con ${t.nombre}` });
+      saldo += r.liquidacion.aPagarAlTransportista - r.liquidacion.aCobrarAlTransportista;
+      codigos.push(r.codigo);
+      await almacen.guardarReserva(r);
+    }
+    if (!codigos.length) throw new ErrorDeLogistica("nada_que_liquidar", `${t.nombre} no tiene reservas pendientes de liquidación.`);
+    return { transportista: t.nombre, reservas: codigos, saldo };
+  }
+
   function cargarServicio(transportistaId: string, servicio: Omit<Servicio, "id">): Servicio {
     const t = registro.por(transportistaId);
     if (!t) throw new ErrorDeLogistica("transportista_desconocido", "Ese transportista no existe.");
@@ -157,6 +199,8 @@ export function motor(almacen: Almacen, registro: Registro, ahora: () => Date = 
     reservar,
     marcarPagada,
     seguimiento,
+    liquidaciones,
+    marcarLiquidada,
     cargarServicio,
     transportistas: () => registro.todos().map((t) => ({ id: t.id, nombre: t.nombre, modo: t.modo, calificacion: t.calificacion, descuentoBelo: t.descuentoBelo, capacidades: t.capacidades, servicios: "servicios" in t ? (t as unknown as { servicios: Servicio[] }).servicios : undefined })),
     reservas: () => almacen.reservas(),

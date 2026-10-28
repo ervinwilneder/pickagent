@@ -91,8 +91,20 @@ export interface Reserva {
   /** Referencia de la reserva en el transportista (su número de envío u orden). */
   referencia: string;
   etiquetaUrl?: string;
-  cobro: { monto: number; moneda: "ARS"; modo: ModoPago; destinatario: { nombre: string; addressType: "BELOTAG" | "CVU" | "ALIAS"; address: string } };
+  /**
+   * Lo que paga el cliente. Por adelantado le paga a pickagent (su cuenta de
+   * belo); contra entrega con belo air le paga al chofer, que cobra por el
+   * transportista.
+   */
+  cobro: { monto: number; moneda: "ARS"; modo: ModoPago; cobradoPor: "pickagent" | "transportista"; destinatario: { nombre: string; addressType: "BELOTAG" | "CVU" | "ALIAS"; address: string } };
   pago?: { transaccionId: string; monto: string; cuando: string };
+  /**
+   * Lo que pickagent y el transportista se deben por esta reserva, después del
+   * cobro: si cobró pickagent, le debe al transportista el neto (precio con
+   * belo menos la comisión); si cobró el transportista en mano, le debe a
+   * pickagent la comisión. Se salda en la liquidación por transportista.
+   */
+  liquidacion: { transportistaId: string; comision: number; neto: number; aPagarAlTransportista: number; aCobrarAlTransportista: number; estado: "pendiente" | "liquidada"; transaccionId?: string; cuando?: string };
   hitos: Hito[];
   creada: string;
   actualizada: string;

@@ -33,6 +33,15 @@ export interface Contexto {
   ahora: Date;
 }
 
+/** La cuenta de belo de pickagent: a dónde le paga el cliente. Sale de la configuración. */
+export interface CuentaPickagent {
+  nombre: string;
+  belotag: string;
+  cvu?: string;
+  /** Comisión de pickagent sobre el precio con belo, como fracción. */
+  comision: number;
+}
+
 export interface Almacen {
   pedido(id: string): Promise<Pedido | undefined>;
   guardarPedido(p: Pedido): Promise<void>;

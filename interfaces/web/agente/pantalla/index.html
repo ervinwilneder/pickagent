@@ -11,6 +11,9 @@
         document.documentElement.dataset.tema = "claro";
         document.documentElement.style.colorScheme = "light";
       }
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("con-revelado");
+      }
     } catch (e) {}
   </script>
   <title>pickagent · tu próximo envío empieza con un mensaje</title>

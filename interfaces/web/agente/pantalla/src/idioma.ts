@@ -303,6 +303,7 @@ export function montarIdioma(): void {
     lista!.setAttribute("aria-label", textos.elegirIdioma);
     for (const opcion of opciones) opcion.setAttribute("aria-selected", String(opcion.dataset.idioma === id));
     guardarIdioma(id);
+    document.dispatchEvent(new Event("pickagent-idioma"));
   }
 
   function abierto() {

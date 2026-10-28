@@ -46,6 +46,11 @@ de la aprobación. No se agregan métricas, clientes, precios ni capacidades.
 - El encabezado de la portada y del chat tiene dos botones de tema. Oscuro
   es el de siempre. Claro repinta fondo, texto, vidrio y bordes. La elección
   queda en el navegador.
+- El texto de la portada entra como en Linear. Cada línea arranca con blur de
+  10px, un 20% más abajo y opacidad 0, y en un segundo llega a su lugar con la
+  curva 0.25, 0.1, 0.25, 1. El título espera 0,4s y cada línea siguiente, 0,1s.
+  El resto aparece al entrar en pantalla. Con movimiento reducido el texto
+  está visible desde el primer instante.
 
 ## Ajustes de la conversación
 

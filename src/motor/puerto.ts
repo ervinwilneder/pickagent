@@ -19,7 +19,8 @@ export interface Transportista {
   cobro: { addressType: "BELOTAG" | "CVU" | "ALIAS"; address: string };
   /** Descuento para quien paga por belo, como fracción. */
   descuentoBelo: number;
-  capacidades: { reserva: boolean; seguimiento: boolean; etiqueta: boolean };
+  /** `contraEntrega`: el chofer cobra en el momento con belo Air, de teléfono a teléfono. */
+  capacidades: { reserva: boolean; seguimiento: boolean; etiqueta: boolean; contraEntrega: boolean };
   /** Devuelve ninguna, una o varias cotizaciones. No tira si no puede: devuelve []. */
   cotizar(pedido: Pedido, contexto: Contexto): Promise<Cotizacion[]>;
   /** Reserva una cotización y devuelve la referencia del transportista. */

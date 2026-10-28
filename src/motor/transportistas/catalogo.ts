@@ -32,6 +32,8 @@ export interface DatosDeCatalogo {
   calificacion: number;
   cobro: Transportista["cobro"];
   descuentoBelo: number;
+  /** Si sus choferes cobran contra entrega con belo Air. */
+  contraEntrega?: boolean;
   servicios: Servicio[];
 }
 
@@ -67,7 +69,7 @@ export function transportistaPorCatalogo(datos: DatosDeCatalogo): Transportista 
     calificacion: datos.calificacion,
     cobro: datos.cobro,
     descuentoBelo: datos.descuentoBelo,
-    capacidades: { reserva: true, seguimiento: true, etiqueta: false },
+    capacidades: { reserva: true, seguimiento: true, etiqueta: false, contraEntrega: datos.contraEntrega ?? false },
     servicios,
     agregarServicio(s) {
       const servicio = { id: `s-${randomUUID().slice(0, 8)}`, ...s };

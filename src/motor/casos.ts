@@ -1,7 +1,7 @@
 /** Casos de uso del motor: pedidos, ofertas, reservas, pagos y seguimiento. */
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import type { Cuidado, Oferta, Pedido, Punto, Reserva } from "./dominio.ts";
+import type { Cuidado, ModoPago, Oferta, Pedido, Punto, Reserva } from "./dominio.ts";
 import { localidad, localidades } from "./localidades.ts";
 import type { Almacen, Contexto } from "./puerto.ts";
 import type { Servicio } from "./transportistas/catalogo.ts";
@@ -77,6 +77,7 @@ export function motor(almacen: Almacen, registro: Registro, ahora: () => Date = 
       transportista: { id: t.id, nombre: t.nombre, calificacion: t.calificacion, modo: t.modo },
       descuentoBelo: t.descuentoBelo,
       precioBelo: Math.round(c.precio * (1 - t.descuentoBelo)),
+      contraEntrega: t.capacidades.contraEntrega,
     }));
     ofertas.sort((a, b) => a.precioBelo - b.precioBelo || new Date(a.entrega).getTime() - new Date(b.entrega).getTime());
     const mejores = ofertas.slice(0, maximo);
@@ -84,12 +85,13 @@ export function motor(almacen: Almacen, registro: Registro, ahora: () => Date = 
     return { pedido, ofertas: mejores, consultados: registro.todos().length, fallas };
   }
 
-  async function reservar(ofertaId: string): Promise<Reserva> {
+  async function reservar(ofertaId: string, modoPago: ModoPago = "anticipado"): Promise<Reserva> {
     const oferta = await almacen.oferta(ofertaId);
     if (!oferta) throw new ErrorDeLogistica("oferta_desconocida", "Esa oferta no existe o venció: pedí las ofertas de nuevo.");
     const pedido = await almacen.pedido(oferta.pedidoId);
     const transportista = registro.por(oferta.transportista.id);
     if (!pedido || !transportista) throw new ErrorDeLogistica("oferta_incompleta", "La oferta no tiene pedido o transportista.");
+    if (modoPago === "contra_entrega_belo_air" && !transportista.capacidades.contraEntrega) throw new ErrorDeLogistica("sin_contra_entrega", `${transportista.nombre} no cobra contra entrega: el pago es por adelantado.`);
     const r = await transportista.reservar(pedido, oferta, contexto()).catch((e) => {
       throw new ErrorDeLogistica("reserva_fallida", `${transportista.nombre} no pudo tomar la reserva: ${e instanceof Error ? e.message : e}`);
     });
@@ -101,7 +103,7 @@ export function motor(almacen: Almacen, registro: Registro, ahora: () => Date = 
       oferta,
       referencia: r.referencia,
       etiquetaUrl: r.etiquetaUrl,
-      cobro: { monto: oferta.precioBelo, moneda: "ARS", destinatario: { ...transportista.cobro, nombre: transportista.nombre } },
+      cobro: { monto: oferta.precioBelo, moneda: "ARS", modo: modoPago, destinatario: { ...transportista.cobro, nombre: transportista.nombre } },
       hitos: r.hitos ?? [{ cuando: ahora().toISOString(), estado: "reservada", detalle: `Reserva tomada por ${transportista.nombre}` }],
       creada: ahora().toISOString(),
       actualizada: ahora().toISOString(),

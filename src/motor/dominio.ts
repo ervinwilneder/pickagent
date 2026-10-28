@@ -9,6 +9,12 @@
 export type Vehiculo = "moto" | "utilitario" | "camion_chico" | "camion" | "red_sucursales";
 export type Cuidado = "fragil" | "refrigerado" | "peligroso";
 export type EstadoReserva = "reservada" | "pagada" | "retirada" | "en_viaje" | "entregada" | "cancelada" | "con_problemas";
+/**
+ * Cuándo y cómo se paga: por adelantado con una transferencia belo, o contra
+ * entrega con belo air: el chofer pide el monto exacto desde su belo, la
+ * persona acerca su teléfono, revisa y confirma, y la plata llega al instante.
+ */
+export type ModoPago = "anticipado" | "contra_entrega_belo_air";
 
 export interface Localidad {
   nombre: string;
@@ -65,6 +71,8 @@ export interface Oferta extends Cotizacion {
   transportista: { id: string; nombre: string; calificacion: number; modo: "catalogo" | "conectado" };
   descuentoBelo: number;
   precioBelo: number;
+  /** Si el transportista acepta cobrar contra entrega con belo Air, de teléfono a teléfono. */
+  contraEntrega: boolean;
 }
 
 export interface Hito {
@@ -83,7 +91,7 @@ export interface Reserva {
   /** Referencia de la reserva en el transportista (su número de envío u orden). */
   referencia: string;
   etiquetaUrl?: string;
-  cobro: { monto: number; moneda: "ARS"; destinatario: { nombre: string; addressType: "BELOTAG" | "CVU" | "ALIAS"; address: string } };
+  cobro: { monto: number; moneda: "ARS"; modo: ModoPago; destinatario: { nombre: string; addressType: "BELOTAG" | "CVU" | "ALIAS"; address: string } };
   pago?: { transaccionId: string; monto: string; cuando: string };
   hitos: Hito[];
   creada: string;
@@ -91,4 +99,5 @@ export interface Reserva {
 }
 
 export const vehiculoLegible: Record<Vehiculo, string> = { moto: "moto", utilitario: "utilitario", camion_chico: "camión chico", camion: "camión", red_sucursales: "red de sucursales" };
+export const modoPagoLegible: Record<ModoPago, string> = { anticipado: "por adelantado con belo", contra_entrega_belo_air: "contra entrega con belo air (acercando los teléfonos)" };
 export const estadoLegible: Record<EstadoReserva, string> = { reservada: "reservada", pagada: "pagada", retirada: "retirada", en_viaje: "en viaje", entregada: "entregada", cancelada: "cancelada", con_problemas: "con problemas" };

@@ -3,7 +3,7 @@ import type { CallToolResult } from "@modelcontextprotocol/client";
 import { conectar, datos, el, esc, textoDeError } from "./comun.ts";
 
 interface Pedido { origen: { localidad: { nombre: string } }; destino: { localidad: { nombre: string } }; mercaderia: string; pesoKg: number; fechaLimite: string }
-interface Oferta { id: string; transportista: { nombre: string; calificacion: number; modo: string }; servicio: string; vehiculo: string; distanciaKm: number; horasViaje: number; retiro: string; entrega: string; precio: number; precioBelo: number; descuentoBelo: number; condiciones?: string[] }
+interface Oferta { id: string; transportista: { nombre: string; calificacion: number; modo: string }; servicio: string; vehiculo: string; distanciaKm: number; horasViaje: number; retiro: string; entrega: string; precio: number; precioBelo: number; descuentoBelo: number; contraEntrega?: boolean; condiciones?: string[] }
 
 const lista = document.getElementById("lista")!;
 const estadoEl = document.getElementById("estado")!;
@@ -37,7 +37,7 @@ function pintar(result: CallToolResult) {
     ...ofertas.map((o, i) =>
       el("article", `oferta${i === 0 ? " mejor" : ""}`, `
         <div>
-          <div class="proveedor">${esc(o.transportista.nombre)} <span class="chip ${i === 0 ? "verde" : ""}">${i === 0 ? "mejor precio" : `★ ${o.transportista.calificacion.toFixed(1)}`}</span>${o.transportista.modo === "conectado" ? ` <span class="chip">api</span>` : ""}</div>
+          <div class="proveedor">${esc(o.transportista.nombre)} <span class="chip ${i === 0 ? "verde" : ""}">${i === 0 ? "mejor precio" : `★ ${o.transportista.calificacion.toFixed(1)}`}</span>${o.transportista.modo === "conectado" ? ` <span class="chip">api</span>` : ""}${o.contraEntrega ? ` <span class="chip verde">belo air · contra entrega</span>` : ""}</div>
           <div class="detalle">${esc(o.servicio)} · ${esc(vehiculo[o.vehiculo] ?? o.vehiculo)} · ${o.horasViaje} h</div>
           <div class="detalle">retiro ${esc(cuando(o.retiro))} · entrega ${esc(cuando(o.entrega))}</div>
           ${o.condiciones?.length ? `<div class="detalle">${esc(o.condiciones.join(" · "))}</div>` : ""}
@@ -66,7 +66,7 @@ const app = conectar("pickagent ofertas", pintar, () => {
     consultados: 5,
     fallas: [],
     ofertas: [
-      { id: "1", transportista: { nombre: "Ruta Pampa Transportes", calificacion: 4.7, modo: "catalogo" }, servicio: "Camión consolidado al interior", vehiculo: "camion", distanciaKm: 356, horasViaje: 7.1, retiro: en(24), entrega: en(31), precio: 234240, precioBelo: 206131, descuentoBelo: 0.12 },
+      { id: "1", transportista: { nombre: "Ruta Pampa Transportes", calificacion: 4.7, modo: "catalogo" }, servicio: "Camión consolidado al interior", vehiculo: "camion", distanciaKm: 356, horasViaje: 7.1, retiro: en(24), entrega: en(31), precio: 234240, precioBelo: 206131, descuentoBelo: 0.12, contraEntrega: true },
       { id: "2", transportista: { nombre: "Andreani", calificacion: 4.5, modo: "conectado" }, servicio: "Andreani Estándar a domicilio", vehiculo: "red_sucursales", distanciaKm: 356, horasViaje: 96, retiro: en(24), entrega: en(120), precio: 240000, precioBelo: 225600, descuentoBelo: 0.06, condiciones: ["seguro incluido hasta el valor declarado"] },
     ],
   };

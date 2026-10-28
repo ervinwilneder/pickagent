@@ -76,7 +76,7 @@ export function transportistaConectado(datos: DatosDeConectado): Transportista {
     calificacion: datos.calificacion,
     cobro: datos.cobro,
     descuentoBelo: datos.descuentoBelo,
-    capacidades: { reserva: true, seguimiento: true, etiqueta: true, ...datos.capacidades },
+    capacidades: { reserva: true, seguimiento: true, etiqueta: true, contraEntrega: false, ...datos.capacidades },
     async cotizar(pedido, contexto) {
       const km = distanciaKm(pedido.origen.localidad, pedido.destino.localidad);
       const limite = new Date(pedido.fechaLimite);

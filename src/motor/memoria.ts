@@ -28,21 +28,21 @@ export function almacenEnMemoria(): Almacen {
 export function registroDeEjemplo(): Registro {
   return new Registro([
     transportistaPorCatalogo({
-      id: "rapidito", nombre: "Rapidito Mensajería", calificacion: 4.6, cobro: { addressType: "BELOTAG", address: "vassa" }, descuentoBelo: 0.1,
+      id: "rapidito", nombre: "Rapidito Mensajería", calificacion: 4.6, cobro: { addressType: "BELOTAG", address: "vassa" }, descuentoBelo: 0.1, contraEntrega: true,
       servicios: [
         { id: "moto-amba", nombre: "Moto express AMBA", vehiculo: "moto", cobertura: { origenes: ["AMBA"], destinos: ["AMBA"] }, tarifa: { base: 3500, porKm: 180, porKg: 0 }, capacidad: { kg: 8, m3: 0.05 }, ventana: { desde: 8, hasta: 21 }, anticipacionHoras: 1, cuidados: ["fragil"], velocidadKmh: 28, horasOperativas: 0.5 },
         { id: "util-amba", nombre: "Utilitario AMBA", vehiculo: "utilitario", cobertura: { origenes: ["AMBA"], destinos: ["AMBA"] }, tarifa: { base: 14000, porKm: 420, porKg: 15 }, capacidad: { kg: 600, m3: 4 }, ventana: { desde: 7, hasta: 19 }, anticipacionHoras: 3, cuidados: ["fragil"], velocidadKmh: 25 },
       ],
     }),
     transportistaPorCatalogo({
-      id: "cargas-del-sur", nombre: "Cargas del Sur", calificacion: 4.4, cobro: { addressType: "BELOTAG", address: "anibio2627" }, descuentoBelo: 0.08,
+      id: "cargas-del-sur", nombre: "Cargas del Sur", calificacion: 4.4, cobro: { addressType: "BELOTAG", address: "anibio2627" }, descuentoBelo: 0.08, contraEntrega: true,
       servicios: [
         { id: "camionchico-amba", nombre: "Camión chico AMBA", vehiculo: "camion_chico", cobertura: { origenes: ["AMBA"], destinos: ["AMBA"] }, tarifa: { base: 32000, porKm: 650, porKg: 12 }, capacidad: { kg: 2500, m3: 16 }, ventana: { desde: 6, hasta: 18 }, anticipacionHoras: 12, cuidados: ["fragil"], velocidadKmh: 24 },
         { id: "util-interior", nombre: "Utilitario al interior", vehiculo: "utilitario", cobertura: { origenes: ["AMBA"], destinos: ["interior"] }, tarifa: { base: 38000, porKm: 520, porKg: 35 }, capacidad: { kg: 700, m3: 4.5 }, ventana: { desde: 5, hasta: 12 }, anticipacionHoras: 18, cuidados: ["fragil"], velocidadKmh: 70 },
       ],
     }),
     transportistaPorCatalogo({
-      id: "ruta-pampa", nombre: "Ruta Pampa Transportes", calificacion: 4.7, cobro: { addressType: "CVU", address: "0000003100066397779989" }, descuentoBelo: 0.12,
+      id: "ruta-pampa", nombre: "Ruta Pampa Transportes", calificacion: 4.7, cobro: { addressType: "CVU", address: "0000003100066397779989" }, descuentoBelo: 0.12, contraEntrega: true,
       servicios: [
         { id: "camion-interior", nombre: "Camión consolidado al interior", vehiculo: "camion", cobertura: { origenes: ["AMBA", "Rosario", "Córdoba"], destinos: ["interior", "AMBA"] }, tarifa: { base: 60000, porKm: 480, porKg: 28, minimo: 90000 }, capacidad: { kg: 8000, m3: 45 }, ventana: { desde: 6, hasta: 16 }, anticipacionHoras: 24, cuidados: ["fragil"], velocidadKmh: 65, horasOperativas: 2 },
         { id: "camionchico-interior", nombre: "Camión chico directo al interior", vehiculo: "camion_chico", cobertura: { origenes: ["AMBA"], destinos: ["interior"] }, tarifa: { base: 52000, porKm: 610, porKg: 30 }, capacidad: { kg: 2500, m3: 16 }, ventana: { desde: 5, hasta: 14 }, anticipacionHoras: 12, cuidados: ["fragil"], velocidadKmh: 75 },

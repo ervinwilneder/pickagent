@@ -8,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import { datosDePedido, ErrorDeLogistica, motor, type Motor } from "./src/motor/casos.ts";
-import { estadoLegible, vehiculoLegible } from "./src/motor/dominio.ts";
+import { estadoLegible, modoPagoLegible, vehiculoLegible } from "./src/motor/dominio.ts";
 import { localidades } from "./src/motor/localidades.ts";
 import { almacenEnMemoria, registroDeEjemplo } from "./src/motor/memoria.ts";
 
@@ -53,7 +53,7 @@ export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemp
       mcp: { _meta: { ui: { resourceUri: UI.ofertas } } },
       execute: ({ pedidoId }) => intentar(async () => {
         const r = await m.ofertasPara(pedidoId);
-        const lineas = r.ofertas.map((o, i) => `${i + 1}. ${o.transportista.nombre} · ${o.servicio} (${vehiculoLegible[o.vehiculo]}): retiro ${hora(o.retiro)}, entrega ${hora(o.entrega)}, ${pesos(o.precio)} de lista, ${pesos(o.precioBelo)} con belo (${Math.round(o.descuentoBelo * 100)} % off)${o.condiciones?.length ? `; ${o.condiciones.join("; ")}` : ""}. id ${o.id}`);
+        const lineas = r.ofertas.map((o, i) => `${i + 1}. ${o.transportista.nombre} · ${o.servicio} (${vehiculoLegible[o.vehiculo]}): retiro ${hora(o.retiro)}, entrega ${hora(o.entrega)}, ${pesos(o.precio)} de lista, ${pesos(o.precioBelo)} con belo (${Math.round(o.descuentoBelo * 100)} % off)${o.contraEntrega ? "; acepta contra entrega con belo air" : ""}${o.condiciones?.length ? `; ${o.condiciones.join("; ")}` : ""}. id ${o.id}`);
         const fallas = r.fallas.length ? ` Sin respuesta de: ${r.fallas.map((f) => `${f.transportista} (${f.motivo})`).join(", ")}.` : "";
         const resumen = r.ofertas.length
           ? `${r.ofertas.length} ofertas de ${r.consultados} transportistas para ${r.pedido.origen.localidad.nombre} → ${r.pedido.destino.localidad.nombre} (${r.ofertas[0]!.distanciaKm} km):\n${lineas.join("\n")}${fallas}`
@@ -64,13 +64,16 @@ export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemp
 
     reservar: createTool({
       id: "reservar",
-      description: "Reserva una oferta elegida por la persona con el transportista y devuelve el cobro: cuánto (ya con el descuento por belo), en qué moneda y a quién pagarle por belo (belotag o CVU del transportista). Después cotizá la transferencia en belo por ese monto, mostrásela a la persona y, cuando apruebe, confirmá y marcá la reserva como pagada.",
-      inputSchema: z.object({ ofertaId: z.string().uuid() }),
-      outputSchema: z.object({ resumen: z.string(), reserva: z.any(), cobro: z.object({ monto: z.string(), moneda: z.string(), destinatario: z.object({ nombre: z.string(), addressType: z.string(), address: z.string() }) }) }),
-      execute: ({ ofertaId }) => intentar(async () => {
-        const r = await m.reservar(ofertaId);
-        const cobro = { monto: r.cobro.monto.toFixed(2), moneda: r.cobro.moneda, destinatario: r.cobro.destinatario };
-        return { resumen: `Reserva ${r.codigo} con ${r.cobro.destinatario.nombre} (referencia ${r.referencia}${r.etiquetaUrl ? `, etiqueta ${r.etiquetaUrl}` : ""}): retiro ${hora(r.oferta.retiro)}, entrega ${hora(r.oferta.entrega)}. A pagar por belo: ${pesos(r.cobro.monto)} a ${r.cobro.destinatario.nombre} (${r.cobro.destinatario.addressType} ${r.cobro.destinatario.address}). Reserva id ${r.id}.`, reserva: r, cobro };
+      description: "Reserva una oferta elegida por la persona con el transportista y devuelve el cobro: cuánto (ya con el descuento por belo), en qué moneda, a quién pagarle por belo (belotag o CVU del transportista) y el modo. Modo 'anticipado': cotizá la transferencia en belo por ese monto, mostrásela a la persona y, cuando apruebe, confirmá y marcá la reserva como pagada. Modo 'contra_entrega_belo_air' (solo si la oferta lo acepta): al retirar o entregar, el chofer pide el monto exacto desde su belo con belo air, la persona acerca su teléfono, revisa y confirma, y la plata llega al instante; no cotices nada; cuando llegue el movimiento de belo, marcá la reserva pagada.",
+      inputSchema: z.object({ ofertaId: z.string().uuid(), modoPago: z.enum(["anticipado", "contra_entrega_belo_air"]).default("anticipado") }),
+      outputSchema: z.object({ resumen: z.string(), reserva: z.any(), cobro: z.object({ monto: z.string(), moneda: z.string(), modo: z.string(), destinatario: z.object({ nombre: z.string(), addressType: z.string(), address: z.string() }) }) }),
+      execute: ({ ofertaId, modoPago }) => intentar(async () => {
+        const r = await m.reservar(ofertaId, modoPago);
+        const cobro = { monto: r.cobro.monto.toFixed(2), moneda: r.cobro.moneda, modo: r.cobro.modo, destinatario: r.cobro.destinatario };
+        const pago = r.cobro.modo === "anticipado"
+          ? `A pagar por belo: ${pesos(r.cobro.monto)} a ${r.cobro.destinatario.nombre} (${r.cobro.destinatario.addressType} ${r.cobro.destinatario.address}).`
+          : `Se paga contra entrega con belo air: al retirar o entregar, el chofer de ${r.cobro.destinatario.nombre} pide ${pesos(r.cobro.monto)} desde su belo, la persona acerca su teléfono, revisa y confirma; nada que cotizar ahora.`;
+        return { resumen: `Reserva ${r.codigo} con ${r.cobro.destinatario.nombre} (referencia ${r.referencia}${r.etiquetaUrl ? `, etiqueta ${r.etiquetaUrl}` : ""}): retiro ${hora(r.oferta.retiro)}, entrega ${hora(r.oferta.entrega)}. ${pago} Reserva id ${r.id}.`, reserva: r, cobro };
       }),
     }),
 
@@ -93,7 +96,7 @@ export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemp
       execute: ({ codigo }) => intentar(async () => {
         const r = await m.seguimiento(codigo);
         const hitos = r.hitos.map((h) => `${hora(h.cuando)}: ${estadoLegible[h.estado]}${h.donde ? ` en ${h.donde}` : ""}, ${h.detalle}`).join("; ");
-        return { resumen: `${r.codigo}: ${estadoLegible[r.estado]}. ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre} con ${r.cobro.destinatario.nombre}; entrega estimada ${hora(r.oferta.entrega)}. Hitos: ${hitos}.`, reserva: r };
+        return { resumen: `${r.codigo}: ${estadoLegible[r.estado]} (pago ${modoPagoLegible[r.cobro.modo]}). ${r.pedido.mercaderia} de ${r.pedido.origen.localidad.nombre} a ${r.pedido.destino.localidad.nombre} con ${r.cobro.destinatario.nombre}; entrega estimada ${hora(r.oferta.entrega)}. Hitos: ${hitos}.`, reserva: r };
       }),
     }),
 

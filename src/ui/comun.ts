@@ -1,20 +1,20 @@
-/** Lo que comparten las vistas: conexión con el host, tema y formato de montos. */
-import { App, applyDocumentTheme, applyHostFonts, applyHostStyleVariables, type McpUiHostContext } from "@modelcontextprotocol/ext-apps";
+/** Lo que comparten las vistas: conexión con el host, formato de montos y el modo muestra. */
+import { App } from "@modelcontextprotocol/ext-apps";
 import type { CallToolResult } from "@modelcontextprotocol/client";
 import "./estilos.css";
 
 export const moneda = (c: string) => (c === "ARGt" ? "ARS" : c);
 
+/** Monto con separadores de es-AR; cripto chica con 6 decimales. */
 export function fmt(monto: string, c: string): string {
   const n = Number(monto);
   const decimales = ["ARS", "ARGt", "BRL"].includes(c) ? 2 : n !== 0 && Math.abs(n) < 1 ? 6 : 2;
-  return `${n.toLocaleString("es-AR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales })} ${moneda(c)}`;
+  return n.toLocaleString("es-AR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
 }
+export const fecha = (iso: string) => new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" });
+export const hora = (iso?: string) => new Date(iso ?? Date.now()).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
 
-export const fecha = (iso: string) => new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
-export const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-
-/** Mastra devuelve el resultado de la tool como JSON en `structuredContent` o en el texto. */
+/** Mastra devuelve el resultado como JSON en `structuredContent` o en el texto. */
 export function datos<T>(result: CallToolResult): T {
   if (result.structuredContent) return result.structuredContent as T;
   const texto = result.content?.find((c) => c.type === "text") as { text?: string } | undefined;
@@ -37,25 +37,20 @@ export function el<K extends keyof HTMLElementTagNameMap>(tag: K, clase?: string
   if (html !== undefined) e.innerHTML = html;
   return e;
 }
-
 export const esc = (s: unknown) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-function contexto(ctx: McpUiHostContext) {
-  if (ctx.theme) applyDocumentTheme(ctx.theme);
-  if (ctx.styles?.variables) applyHostStyleVariables(ctx.styles.variables);
-  if (ctx.styles?.css?.fonts) applyHostFonts(ctx.styles.css.fonts);
-}
+/** Sin host (la vista abierta sola en un navegador) se muestra con datos de ejemplo. */
+export const sinHost = window.parent === window;
 
-/** Crea la app, registra los handlers antes de conectar, y conecta. */
-export function conectar(nombre: string, handlers: { alResultado: (r: CallToolResult) => void; alInput?: (args: Record<string, unknown>) => void }): App {
+/** Crea la app, registra los handlers antes de conectar, y conecta. En modo muestra pinta el ejemplo. */
+export function conectar(nombre: string, alResultado: (r: CallToolResult) => void, muestra?: () => Record<string, unknown>): App {
   const app = new App({ name: nombre, version: "0.0.0" });
-  app.ontoolresult = handlers.alResultado;
-  if (handlers.alInput) app.ontoolinput = (p) => handlers.alInput!((p as { arguments?: Record<string, unknown> }).arguments ?? {});
-  app.onhostcontextchanged = contexto;
+  app.ontoolresult = alResultado;
   app.onerror = console.error;
-  app.connect().then(() => {
-    const ctx = app.getHostContext();
-    if (ctx) contexto(ctx);
-  });
+  if (sinHost && muestra) {
+    alResultado({ content: [], structuredContent: muestra() });
+  } else {
+    void app.connect();
+  }
   return app;
 }

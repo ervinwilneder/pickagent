@@ -1,64 +1,135 @@
+/*
+ * Sistema visual de las vistas, con la estética de belo Agentic Banking:
+ * terminal sobre negro, monoespaciada para datos, condensada en mayúsculas
+ * para lo grande, verde lima para la acción. Es un look único y deliberado:
+ * el panel es oscuro también cuando el chat del host es claro.
+ *
+ * Tokens: negro de fondo, panel, línea, papel para el texto, apagado para lo
+ * secundario, verde para acción y estado bueno, naranja para alerta.
+ */
+@import "./fuentes.css";
+
 :root {
-  --fondo: var(--color-background-primary, #ffffff);
-  --texto: var(--color-text-primary, #16161a);
-  --tenue: var(--color-text-secondary, #6b6b76);
-  --borde: var(--color-border-primary, #e4e4ea);
-  --acento: #4f46e5;
-  --positivo: #15803d;
-  --negativo: #b91c1c;
-  font-family: var(--font-sans, system-ui, -apple-system, "Segoe UI", sans-serif);
+  --negro: #050606;
+  --panel: #0c0e0d;
+  --panel-alto: #111412;
+  --linea: #303531;
+  --linea-suave: #1b1f1c;
+  --papel: #f1f2ec;
+  --apagado: #8d958f;
+  --verde: #b9ff18;
+  --verde-tenue: rgba(185, 255, 24, .12);
+  --naranja: #ff5a1f;
+  --azul: #292dff;
+  --display: "Sofia Sans Extra Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --mono: "Fragment Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --texto: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radio: 4px;
+  color-scheme: dark;
 }
-@media (prefers-color-scheme: dark) {
-  :root { --fondo: var(--color-background-primary, #121216); --texto: var(--color-text-primary, #f2f2f5); --tenue: var(--color-text-secondary, #a0a0ab); --borde: var(--color-border-primary, #2c2c34); --positivo: #4ade80; --negativo: #f87171; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--negro);
+  color: var(--papel);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding: 0;
 }
-body { margin: 0; background: var(--fondo); color: var(--texto); }
-.cuenta { padding: 16px; max-width: 720px; }
-.cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-h1 { font-size: 20px; margin: 0; }
-h2 { font-size: 14px; color: var(--tenue); margin: 20px 0 8px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-button { border: 1px solid var(--borde); background: transparent; color: var(--texto); border-radius: 8px; padding: 6px 12px; cursor: pointer; font: inherit; }
-button:hover { border-color: var(--acento); }
-.saldos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
-.saldo { border: 1px solid var(--borde); border-radius: 12px; padding: 12px; }
-.saldo .moneda { font-size: 12px; color: var(--tenue); }
-.saldo .monto { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; margin: 4px 0; }
-.saldo .rinde { font-size: 12px; color: var(--positivo); }
-ul { list-style: none; margin: 0; padding: 0; }
-li { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid var(--borde); }
-li .quien { font-weight: 500; }
-li .detalle { font-size: 12px; color: var(--tenue); grid-column: 1; }
-li .monto { font-variant-numeric: tabular-nums; text-align: right; }
-li .monto.entra { color: var(--positivo); }
-li .monto.sale { color: var(--negativo); }
-.estado { font-size: 12px; color: var(--tenue); min-height: 1em; }
+a { color: var(--verde); }
+button, input { font: inherit; color: inherit; }
 
-/* Operación */
-.operacion { border: 1px solid var(--borde); border-radius: 14px; padding: 16px; max-width: 520px; }
-.operacion .titulo { font-size: 13px; color: var(--tenue); text-transform: uppercase; letter-spacing: .04em; }
-.operacion .principal { font-size: 26px; font-weight: 600; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
-.operacion .destino { color: var(--texto); }
-.operacion .destino small { color: var(--tenue); display: block; }
-.operacion dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 14px 0; font-size: 14px; }
-.operacion dt { color: var(--tenue); }
-.operacion dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
-.operacion .vence { font-size: 13px; color: var(--tenue); }
-.operacion .vence.pronto { color: var(--negativo); }
-.acciones { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-.acciones .primario { background: var(--acento); border-color: var(--acento); color: #fff; }
-.acciones button:disabled { opacity: .5; cursor: default; }
-.resultado { margin-top: 12px; font-size: 14px; }
-.resultado.ok { color: var(--positivo); }
-.resultado.error { color: var(--negativo); }
-.aviso { border: 1px dashed var(--borde); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--tenue); margin-top: 12px; }
+/* Panel: la unidad de cada vista. Barra de cabecera con etiqueta y estado. */
+.panel { background: var(--panel); border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; }
+.cabecera { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 14px; border-bottom: 1px solid var(--linea); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--apagado); }
+.cabecera .estado { color: var(--verde); white-space: nowrap; }
+.cabecera .estado.alerta { color: var(--naranja); }
+.cuerpo { padding: 16px 14px 14px; display: grid; gap: 14px; }
+.cuerpo > p { margin: 0; }
+.pie { display: flex; gap: 14px; flex-wrap: wrap; padding: 8px 14px; border-top: 1px solid var(--linea); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--apagado); }
+.pie b { color: var(--verde); font-weight: 400; }
 
-/* Listas de contactos y direcciones */
-.tarjetas { display: grid; gap: 10px; }
-.tarjeta { border: 1px solid var(--borde); border-radius: 12px; padding: 12px; }
-.tarjeta .nombre { font-weight: 600; }
-.tarjeta .etiqueta { font-size: 11px; color: var(--tenue); text-transform: uppercase; letter-spacing: .04em; margin-left: 6px; }
-.tarjeta .linea { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 6px 0; border-top: 1px solid var(--borde); font-size: 13px; }
-.tarjeta .linea:first-of-type { border-top: 0; }
-.tarjeta code { font-family: var(--font-mono, ui-monospace, Menlo, monospace); font-size: 12px; word-break: break-all; }
-.tarjeta .copiar { font-size: 12px; padding: 3px 8px; white-space: nowrap; }
-.buscador { display: flex; gap: 8px; margin: 10px 0 14px; }
-.buscador input { flex: 1; border: 1px solid var(--borde); border-radius: 8px; padding: 6px 10px; background: transparent; color: var(--texto); font: inherit; }
+/* Línea de prompt: qué se pidió, como un comando. */
+.prompt { color: var(--papel); word-break: break-word; }
+.prompt::before { content: "$ "; color: var(--verde); }
+.nota { color: var(--apagado); }
+.nota::before { content: "// "; }
+
+/* Lo grande: la condensada en mayúsculas. */
+.grande { font-family: var(--display); font-weight: 700; font-size: 44px; line-height: .95; letter-spacing: -.01em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.grande small { font-size: .5em; color: var(--apagado); letter-spacing: 0; margin-left: 6px; }
+.titulo { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1; text-transform: uppercase; }
+.titulo em { font-style: normal; color: var(--naranja); }
+.seccion { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--apagado); display: flex; justify-content: space-between; gap: 10px; }
+
+/* Chips entre corchetes, como los códigos de país. */
+.chip { display: inline-block; border: 1px solid var(--linea); color: var(--papel); padding: 1px 6px; border-radius: 2px; font-size: 11px; letter-spacing: .04em; white-space: nowrap; }
+.chip::before { content: "["; color: var(--apagado); }
+.chip::after { content: "]"; color: var(--apagado); }
+.chip.verde { border-color: rgba(185, 255, 24, .5); color: var(--verde); }
+.chip.verde::before, .chip.verde::after { color: rgba(185, 255, 24, .6); }
+
+/* Divisores punteados y listas de pares. */
+.punteado { border: 0; border-top: 1px dotted var(--linea); margin: 0; }
+.pares { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; margin: 0; }
+.pares dt { color: var(--apagado); }
+.pares dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Saldos: una grilla de tiles. */
+.saldos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.saldo { border: 1px solid var(--linea-suave); background: var(--panel-alto); border-radius: var(--radio); padding: 10px 12px; display: grid; gap: 6px; justify-items: start; }
+.saldo .monto { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.saldo .rinde { font-size: 11px; color: var(--verde); }
+.saldo .rinde.nada { color: var(--apagado); }
+
+/* Filas: movimientos, contactos, direcciones. */
+.filas { display: grid; }
+.fila { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 9px 0; border-top: 1px dotted var(--linea); align-items: baseline; }
+.fila:first-child { border-top: 0; padding-top: 0; }
+.fila .quien { grid-column: 1; grid-row: 1; font-family: var(--texto); font-weight: 700; font-size: 14px; color: var(--papel); min-width: 0; overflow-wrap: anywhere; }
+.fila .detalle { grid-column: 1; grid-row: 2; font-size: 11px; color: var(--apagado); min-width: 0; overflow-wrap: anywhere; }
+.fila .monto { grid-column: 2; grid-row: 1 / span 2; align-self: center; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fila .filas { grid-column: 1 / -1; grid-row: 3; padding-left: 12px; border-left: 1px solid var(--linea-suave); margin-top: 6px; }
+.fila .monto.entra { color: var(--verde); }
+.fila .monto.sale { color: var(--papel); }
+.fila .monto.pendiente { color: var(--apagado); }
+.marca { color: var(--apagado); }
+.marca.ok { color: var(--verde); }
+.marca.mal { color: var(--naranja); }
+code, .codigo, .fila .quien.codigo { font-family: var(--mono); font-weight: 400; font-size: 12px; color: var(--papel); word-break: break-all; }
+
+/* Botones: el primario es el verde de belo; el secundario, solo borde. */
+.acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+.boton { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 10px 14px; border-radius: 2px; border: 1px solid var(--linea); background: transparent; color: var(--papel); cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.boton:hover { border-color: var(--papel); }
+.boton:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
+.boton:disabled { opacity: .45; cursor: default; }
+.boton.primario { background: var(--verde); border-color: var(--verde); color: var(--negro); font-weight: 700; flex: 1 1 auto; }
+.boton.primario:hover:not(:disabled) { background: #cbff4a; }
+.boton.chico { padding: 5px 9px; font-size: 11px; }
+
+/* Entrada de texto como la del waitlist. */
+.entrada { display: flex; border: 1px solid var(--linea); border-radius: 2px; background: var(--negro); }
+.entrada input { flex: 1; min-width: 0; background: transparent; border: 0; padding: 9px 12px; color: var(--papel); }
+.entrada input::placeholder { color: var(--apagado); }
+.entrada input:focus { outline: none; }
+.entrada .boton { border: 0; border-left: 1px solid var(--linea); border-radius: 0; }
+
+/* Cuenta regresiva de la cotización. */
+.vence { display: grid; gap: 6px; font-size: 11px; color: var(--apagado); letter-spacing: .04em; }
+.vence .barra { height: 3px; background: var(--linea-suave); border-radius: 2px; overflow: hidden; }
+.vence .barra i { display: block; height: 100%; background: var(--verde); transition: width .5s linear; }
+.vence.pronto { color: var(--naranja); }
+.vence.pronto .barra i { background: var(--naranja); }
+
+/* Resultado de una acción. */
+.resultado { font-size: 12px; min-height: 1.5em; }
+.resultado.ok { color: var(--verde); }
+.resultado.mal { color: var(--naranja); }
+.resultado a { color: var(--verde); }
+
+@media (prefers-reduced-motion: reduce) { .vence .barra i, .boton { transition: none; } }
+@media (max-width: 420px) { .grande { font-size: 36px; } .cuerpo { padding: 14px 12px 12px; } }

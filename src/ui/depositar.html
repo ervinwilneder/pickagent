@@ -3,15 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light dark">
+  <meta name="color-scheme" content="dark">
   <title>Depositar</title>
 </head>
 <body>
-  <main class="cuenta">
-    <header class="cabecera"><h1>Depositar</h1></header>
-    <section class="tarjetas" id="lista"></section>
-    <p class="estado" id="estado"></p>
-  </main>
+  <section class="panel" aria-label="Depositar">
+    <header class="cabecera"><span>belo_depositar</span><span class="estado" id="estado">cargando</span></header>
+    <div class="cuerpo">
+      <p class="prompt">belo depositar --direcciones</p>
+      <p class="nota">son estables: las podés reutilizar en cada depósito</p>
+      <div class="filas" id="lista"></div>
+    </div>
+    <footer class="pie"><span>pesos://<b>cvu_alias</b></span><span>cripto://<b>por_red</b></span></footer>
+  </section>
   <script type="module" src="./depositar.ts"></script>
 </body>
 </html>

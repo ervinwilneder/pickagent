@@ -9,7 +9,7 @@ const mcp = new MCPClient({ id: "escucha", servers: { belo: { url } } });
 
 console.log("eventos disponibles:", (await mcp.events.list("belo")).map((e) => e.name));
 console.log("escuchando movimiento.nuevo…");
-const sub = await mcp.events.subscribe("belo", "movimiento.nuevo", {}, { delivery: "push" });
+const sub = await mcp.events.subscribe("belo", "movimiento.nuevo", {}, { delivery: "poll" });
 for await (const evento of sub) {
   const m = evento.data as { tipo: string; monto: string; moneda: string; contraparte: string | null };
   console.log(`[${evento.timestamp}] ${m.tipo} ${m.monto} ${m.moneda}${m.contraparte ? ` · ${m.contraparte}` : ""}`);

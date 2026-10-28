@@ -37,16 +37,22 @@ export function registroDeEjemplo(): Registro {
     transportistaPorCatalogo({
       id: "cargas-del-sur", nombre: "Cargas del Sur", calificacion: 4.4, cobro: { addressType: "BELOTAG", address: "anibio2627" }, descuentoBelo: 0.08, contraEntrega: true,
       servicios: [
-        { id: "camionchico-amba", nombre: "Camión chico AMBA", vehiculo: "camion_chico", cobertura: { origenes: ["AMBA"], destinos: ["AMBA"] }, tarifa: { base: 32000, porKm: 650, porKg: 12 }, capacidad: { kg: 2500, m3: 16 }, ventana: { desde: 6, hasta: 18 }, anticipacionHoras: 12, cuidados: ["fragil"], velocidadKmh: 24 },
+        { id: "camionchico-amba", nombre: "Camión chico AMBA a depósito", vehiculo: "camion_chico", cobertura: { origenes: ["AMBA"], destinos: ["AMBA"] }, tarifa: { base: 26000, porKm: 520, porKg: 10 }, capacidad: { kg: 2500, m3: 16 }, ventana: { desde: 6, hasta: 18 }, anticipacionHoras: 2, cuidados: ["fragil"], velocidadKmh: 24, deposito: { destino: true } },
         { id: "util-interior", nombre: "Utilitario al interior", vehiculo: "utilitario", cobertura: { origenes: ["AMBA"], destinos: ["interior"] }, tarifa: { base: 38000, porKm: 520, porKg: 35 }, capacidad: { kg: 700, m3: 4.5 }, ventana: { desde: 5, hasta: 12 }, anticipacionHoras: 18, cuidados: ["fragil"], velocidadKmh: 70 },
       ],
     }),
     transportistaPorCatalogo({
       id: "ruta-pampa", nombre: "Ruta Pampa Transportes", calificacion: 4.7, cobro: { addressType: "CVU", address: "0000003100066397779989" }, descuentoBelo: 0.12, contraEntrega: true,
       servicios: [
-        { id: "camion-interior", nombre: "Camión consolidado al interior", vehiculo: "camion", cobertura: { origenes: ["AMBA", "Rosario", "Córdoba"], destinos: ["interior", "AMBA"] }, tarifa: { base: 60000, porKm: 480, porKg: 28, minimo: 90000 }, capacidad: { kg: 8000, m3: 45 }, ventana: { desde: 6, hasta: 16 }, anticipacionHoras: 24, cuidados: ["fragil"], velocidadKmh: 65, horasOperativas: 2 },
+        { id: "camion-interior", nombre: "Camión consolidado al interior", vehiculo: "camion", cobertura: { origenes: ["AMBA", "Rosario", "Córdoba"], destinos: ["interior", "AMBA"] }, tarifa: { base: 60000, porKm: 480, porKg: 28, minimo: 90000 }, capacidad: { kg: 8000, m3: 45 }, ventana: { desde: 6, hasta: 16 }, anticipacionHoras: 24, cuidados: ["fragil"], velocidadKmh: 65, horasOperativas: 2, deposito: { destino: true } },
         { id: "camionchico-interior", nombre: "Camión chico directo al interior", vehiculo: "camion_chico", cobertura: { origenes: ["AMBA"], destinos: ["interior"] }, tarifa: { base: 52000, porKm: 610, porKg: 30 }, capacidad: { kg: 2500, m3: 16 }, ventana: { desde: 5, hasta: 14 }, anticipacionHoras: 12, cuidados: ["fragil"], velocidadKmh: 75 },
         { id: "frio-interior", nombre: "Refrigerado al interior", vehiculo: "camion_chico", cobertura: { origenes: ["AMBA"], destinos: ["interior"] }, tarifa: { base: 95000, porKm: 820, porKg: 55 }, capacidad: { kg: 3000, m3: 18 }, ventana: { desde: 4, hasta: 10 }, anticipacionHoras: 24, cuidados: ["refrigerado", "fragil"], velocidadKmh: 70 },
+      ],
+    }),
+    transportistaPorCatalogo({
+      id: "rosario-express", nombre: "Rosario Express", calificacion: 4.5, cobro: { addressType: "CVU", address: "0000003100099988877766" }, descuentoBelo: 0.1, contraEntrega: true,
+      servicios: [
+        { id: "util-rosario", nombre: "Utilitario última milla Rosario", vehiculo: "utilitario", cobertura: { origenes: ["Rosario"], destinos: ["Rosario"] }, tarifa: { base: 9000, porKm: 400, porKg: 12 }, capacidad: { kg: 700, m3: 4.5 }, ventana: { desde: 7, hasta: 20 }, anticipacionHoras: 1, cuidados: ["fragil"], velocidadKmh: 25 },
       ],
     }),
     transportistaConectado({ id: "andreani", nombre: "Andreani", calificacion: 4.5, cobro: { addressType: "CVU", address: "0000003100072524561404" }, descuentoBelo: 0.06, cliente: clienteAndreaniSimulado() }),

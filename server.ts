@@ -10,6 +10,7 @@ import { z } from "zod";
 import { datosDePedido, ErrorDeLogistica, motor, type Motor } from "./src/motor/casos.ts";
 import { estadoLegible, modoPagoLegible, vehiculoLegible } from "./src/motor/dominio.ts";
 import { localidades } from "./src/motor/localidades.ts";
+import { almacenEnArchivo } from "./src/motor/archivo.ts";
 import { almacenEnMemoria, registroDeEjemplo } from "./src/motor/memoria.ts";
 
 const vista = (nombre: string) => fs.readFileSync(path.join(process.cwd(), "dist", `${nombre}.html`), "utf-8");
@@ -30,7 +31,10 @@ function cuentaPickagent() {
   return { nombre: process.env.PICKAGENT_NOMBRE ?? "pickagent", belotag, cvu: process.env.PICKAGENT_CVU, comision: Number(process.env.PICKAGENT_COMISION ?? "0.08") };
 }
 
-export function crearServer(m: Motor = motor(almacenEnMemoria(), registroDeEjemplo(), cuentaPickagent())) {
+/** Con LOGISTICA_DATOS, el almacén vive en ese archivo y sobrevive a los reinicios; sin él, en memoria. */
+const almacen = () => (process.env.LOGISTICA_DATOS ? almacenEnArchivo(process.env.LOGISTICA_DATOS) : almacenEnMemoria());
+
+export function crearServer(m: Motor = motor(almacen(), registroDeEjemplo(), cuentaPickagent())) {
   const tools = {
     pedido_envio: createTool({
       id: "pedido_envio",

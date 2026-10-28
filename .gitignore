@@ -4,3 +4,4 @@ api/
 .env
 .env.local
 .vercel/
+datos/

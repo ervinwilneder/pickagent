@@ -37,7 +37,10 @@ export function puntosDeCobroEnSpotme(url: string): PuntosDeCobro {
     return JSON.parse(r.content?.find((c) => c.type === "text")?.text ?? "{}") as T;
   }
   return {
-    crear: (e) => llamar("spotme_create_hotspot", { nombre: e.nombre, lat: e.lat, lon: e.lon, radioM: e.radioM, cvu: e.cvu, importe: e.importe }),
+    async crear(e) {
+      const r = await llamar<{ hotspotId: string; enlaceCobro: string; codigo: string }>("spotme_create_hotspot", { nombre: e.nombre, lat: e.lat, lon: e.lon, radioM: e.radioM, cvu: e.cvu, importe: e.importe });
+      return { hotspotId: r.hotspotId, enlace: r.enlaceCobro, codigo: r.codigo };
+    },
     async estado(hotspotId) {
       const r = await llamar<{ pago: { estado: string }; registro: { idBelo: string | null } }>("spotme_get_hotspot", { hotspotId });
       const estado = r.pago.estado;

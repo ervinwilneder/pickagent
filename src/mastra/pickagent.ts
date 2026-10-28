@@ -5,7 +5,7 @@
 import { Agent } from "@mastra/core/agent";
 
 /** La fecha y hora actuales en Argentina, para resolver "el lunes a las 18" sin adivinar. */
-const ahora = () => `Hoy es ${new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })} (hora de Argentina, UTC-3). Cuando la persona dice un día relativo, calculá la fecha a partir de hoy y usá la zona -03:00.`;
+const ahora = () => `Hoy es ${new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })} (hora de Argentina, UTC-3). Cuando la persona dice un día relativo, calculá la fecha a partir de hoy y usá la zona -03:00. Las horas que las herramientas ya escriben en texto (retiro, entrega, hitos) están en hora de Argentina: repetilas tal cual, no las recalcules desde fechas ISO.`;
 import { LibSQLStore } from "@mastra/libsql";
 import { MCPClient, MCPEventsSignalProvider, MCPServer } from "@mastra/mcp";
 import { Memory } from "@mastra/memory";

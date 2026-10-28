@@ -32,6 +32,7 @@ body { background: var(--negro); color: var(--papel); font-family: var(--mono); 
 .contenido p.mal { color: var(--naranja); font-family: var(--mono); font-size: 12px; }
 .contenido code { color: var(--papel); }
 .llamada { font-size: 12px; color: var(--apagado); }
+.llamada[data-estado]::after { content: " · " attr(data-estado); color: var(--apagado); }
 .marca { color: var(--apagado); }
 .marca.ok { color: var(--verde); }
 .marca.mal { color: var(--naranja); }

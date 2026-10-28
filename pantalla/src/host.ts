@@ -33,7 +33,8 @@ export interface Servidor {
 export async function conectarServidor(url: URL): Promise<Servidor> {
   const client = new Client(IMPLEMENTACION);
   await client.connect(new StreamableHTTPClientTransport(url));
-  const [tools, resources] = await Promise.all([client.listTools(), client.listResources()]);
+  const tools = await client.listTools();
+  const resources = await client.listResources();
   return {
     client,
     tools: new Map(tools.tools.map((t) => [t.name, t])),
@@ -52,7 +53,10 @@ async function leerVista(servidor: Servidor, uri: string) {
   let p = servidor.html.get(uri);
   if (!p) {
     p = (async () => {
-      const r = await servidor.client.readResource({ uri });
+      // Un pedido que no vuelve se reintenta una vez; la vista pesa unos 350 KB.
+      const leer = () => servidor.client.readResource({ uri });
+      const conPlazo = (q: Promise<Awaited<ReturnType<typeof leer>>>) => Promise.race([q, new Promise<never>((_, rej) => setTimeout(() => rej(new Error("sin respuesta")), 10_000))]);
+      const r = await conPlazo(leer()).catch(() => conPlazo(leer()));
       const c = r.contents[0];
       if (!c || c.mimeType !== RESOURCE_MIME_TYPE) throw new Error(`La vista ${uri} no es una MCP App`);
       const html = "blob" in c ? atob(c.blob as string) : (c.text as string);
@@ -66,11 +70,15 @@ async function leerVista(servidor: Servidor, uri: string) {
 
 export interface OpcionesVista {
   alMensaje?: (m: McpUiMessageRequest["params"]) => void;
+  alEstado?: (paso: string) => void;
 }
 
 /** Renderiza la vista de una tool con su input y su resultado dentro de `contenedor`. */
 export async function renderizarVista(servidor: Servidor, uri: string, contenedor: HTMLElement, input: Record<string, unknown>, resultado: Promise<CallToolResult>, opciones: OpcionesVista = {}): Promise<void> {
+  const paso = (t: string) => opciones.alEstado?.(t);
+  paso("leyendo la vista");
   const { html, csp, permissions } = await leerVista(servidor, uri);
+  paso("cargando el sandbox");
   const iframe = document.createElement("iframe");
   iframe.className = "vista";
   iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms");
@@ -78,11 +86,15 @@ export async function renderizarVista(servidor: Servidor, uri: string, contenedo
   if (allow) iframe.setAttribute("allow", allow);
   contenedor.replaceChildren(iframe);
 
-  const listo = new Promise<void>((resolve) => {
+  const listo = new Promise<void>((resolve, reject) => {
     const oir = ({ source, data }: MessageEvent) => {
-      if (source === iframe.contentWindow && data?.method === "ui/notifications/sandbox-proxy-ready") {
+      if (source !== iframe.contentWindow) return;
+      if (data?.method === "ui/notifications/sandbox-proxy-ready") {
         window.removeEventListener("message", oir);
         resolve();
+      } else if (data?.method === "belo/sandbox-error") {
+        window.removeEventListener("message", oir);
+        reject(new Error(String(data.params?.mensaje ?? "el sandbox falló")));
       }
     };
     window.addEventListener("message", oir);
@@ -90,7 +102,8 @@ export async function renderizarVista(servidor: Servidor, uri: string, contenedo
   const u = urlDelSandbox();
   if (csp) u.searchParams.set("csp", JSON.stringify(csp));
   iframe.src = u.href;
-  await listo;
+  await Promise.race([listo, new Promise<never>((_, rej) => setTimeout(() => rej(new Error(`el sandbox en ${u.origin} no respondió`)), 15_000))]);
+  paso("sandbox listo");
 
   const caps = servidor.client.getServerCapabilities();
   const puente = new AppBridge(servidor.client, IMPLEMENTACION, {
@@ -128,7 +141,9 @@ export async function renderizarVista(servidor: Servidor, uri: string, contenedo
   });
   await puente.connect(new PostMessageTransport(iframe.contentWindow!, iframe.contentWindow!));
   await puente.sendSandboxResourceReady({ html, csp, permissions });
-  await inicializada;
+  paso("vista enviada, esperando que inicialice");
+  await Promise.race([inicializada, new Promise<never>((_, rej) => setTimeout(() => rej(new Error("la vista no inicializó")), 15_000))]);
+  paso("vista inicializada");
   puente.sendToolInput({ arguments: input });
   resultado.then(
     (r) => puente.sendToolResult(r),

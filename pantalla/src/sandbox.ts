@@ -5,12 +5,19 @@
  */
 import { buildAllowAttribute, type McpUiSandboxProxyReadyNotification, type McpUiSandboxResourceReadyNotification } from "@modelcontextprotocol/ext-apps/app-bridge";
 
-if (window.self === window.top) throw new Error("Este archivo solo corre dentro de un iframe.");
-if (!document.referrer) throw new Error("Sin referrer: no se puede validar quién embebe.");
+/** Un error de arranque se le cuenta al host antes de abortar, para poder diagnosticarlo. */
+function abortar(mensaje: string): never {
+  try {
+    window.parent?.postMessage({ jsonrpc: "2.0", method: "belo/sandbox-error", params: { mensaje } }, "*");
+  } catch {}
+  throw new Error(mensaje);
+}
+if (window.self === window.top) abortar("Este archivo solo corre dentro de un iframe.");
+if (!document.referrer) abortar("Sin referrer: no se puede validar quién embebe.");
 const ORIGEN_PANTALLA = new URL(document.referrer).origin;
 // Quién puede embeber el sandbox: la pantalla local, o la publicada (VITE_PANTALLA_ORIGEN).
 const permitidos = [/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/, ...String(import.meta.env.VITE_PANTALLA_ORIGEN ?? "").split(",").filter(Boolean).map((o) => new RegExp(`^${o.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`))];
-if (!permitidos.some((re) => re.test(ORIGEN_PANTALLA))) throw new Error(`Origen no permitido: ${ORIGEN_PANTALLA}`);
+if (!permitidos.some((re) => re.test(ORIGEN_PANTALLA))) abortar(`Origen no permitido: ${ORIGEN_PANTALLA}`);
 const ORIGEN_PROPIO = new URL(window.location.href).origin;
 
 // Si window.top fuera accesible, el sandbox estaría mal configurado.
@@ -18,7 +25,7 @@ try {
   window.top!.alert("sandbox roto");
   throw "FALLA";
 } catch (e) {
-  if (e === "FALLA") throw new Error("El sandbox no está aislado.");
+  if (e === "FALLA") abortar("El sandbox no está aislado.");
 }
 
 const interno = document.createElement("iframe");
@@ -56,4 +63,5 @@ window.addEventListener("message", (event) => {
   }
 });
 
+window.addEventListener("error", (e) => abortar(`error en el sandbox: ${e.message}`));
 window.parent.postMessage({ jsonrpc: "2.0", method: PROXY_LISTO, params: {} }, ORIGEN_PANTALLA);

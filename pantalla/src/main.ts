@@ -109,6 +109,7 @@ function abrirLlamada(id: string, nombre: string, args: Record<string, unknown>)
         const t = m.content.map((c) => ("text" in c ? c.text : "")).join("");
         if (t) void enviar(t, true);
       },
+      alEstado: (p) => (caja.dataset.estado = p),
     }).catch((e) => (marco.textContent = `No pude mostrar la vista: ${e instanceof Error ? e.message : e}`));
   }
 }
@@ -168,7 +169,7 @@ function pintarHistorial(mensajes: { role: string; content?: unknown; createdAt?
             caja.after(marco);
             const r = salida as { content?: unknown };
             const res: CallToolResult = Array.isArray(r?.content) ? (r as CallToolResult) : { content: [{ type: "text", text: JSON.stringify(salida) }], structuredContent: salida as Record<string, unknown> };
-            void renderizarVista(servidor, uri, marco, p.input ?? p.args ?? {}, Promise.resolve(res)).catch(() => marco.remove());
+            void renderizarVista(servidor, uri, marco, p.input ?? p.args ?? {}, Promise.resolve(res), { alEstado: (paso) => (caja.dataset.estado = paso) }).catch((e) => (marco.textContent = `No pude mostrar la vista: ${e instanceof Error ? e.message : e}`));
           }
         } else if (p.type === "error") {
           const el = document.createElement("p");

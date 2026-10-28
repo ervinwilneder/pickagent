@@ -49,3 +49,6 @@ body { background: var(--negro); color: var(--papel); font-family: var(--mono); 
 .pie { display: flex; gap: 14px; flex-wrap: wrap; padding: 6px 16px; border-top: 1px solid var(--linea); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--apagado); }
 .pie b { color: var(--verde); font-weight: 400; }
 @media (max-width: 600px) { .barra { grid-template-columns: auto auto; } .centro { display: none; } }
+
+.pie .agentes a { color: var(--apagado); text-decoration: none; }
+.pie .agentes a.activo { color: var(--verde); }

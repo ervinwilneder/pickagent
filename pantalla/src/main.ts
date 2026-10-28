@@ -14,8 +14,10 @@ const SERVERS: Record<string, string> = {
   logistica: import.meta.env.VITE_LOGISTICA_MCP_URL ?? "http://localhost:3002/mcp",
   belo: import.meta.env.VITE_BELO_MCP_URL ?? "http://localhost:3001/mcp",
 };
-const AGENTE = import.meta.env.VITE_AGENTE ?? "pickagent";
-const HILO = { threadId: import.meta.env.VITE_HILO ?? "principal", resourceId: import.meta.env.VITE_PERSONA ?? "ervin" };
+/** ?agente=asistente abre el asistente personal (con belo); ?agente=asistente-sin-belo, el mismo sin belo. */
+const AGENTE = new URLSearchParams(location.search).get("agente") ?? import.meta.env.VITE_AGENTE ?? "pickagent";
+const HILO = { threadId: AGENTE === "pickagent" ? "principal" : AGENTE, resourceId: import.meta.env.VITE_PERSONA ?? "ervin" };
+const NOMBRE: Record<string, string> = { pickagent: "pickagent", asistente: "mi asistente · con belo", "asistente-sin-belo": "mi asistente · sin belo" };
 
 const mensajesEl = document.getElementById("mensajes")!;
 const estadoEl = document.getElementById("estado")!;
@@ -40,7 +42,7 @@ const llamadas = new Map<string, { nombre: string; args: Record<string, unknown>
 function burbuja(rol: "persona" | "agente" | "evento", cuando?: string | number) {
   const b = document.createElement("article");
   b.className = `mensaje ${rol}`;
-  b.innerHTML = `<header><span class="rol">${rol === "persona" ? "$ vos" : rol === "agente" ? "pickagent" : "[evento]"}</span><span class="cuando">${esc(hora(cuando))}</span></header><div class="contenido"></div>`;
+  b.innerHTML = `<header><span class="rol">${rol === "persona" ? "$ vos" : rol === "agente" ? esc(NOMBRE[AGENTE] ?? AGENTE) : "[evento]"}</span><span class="cuando">${esc(hora(cuando))}</span></header><div class="contenido"></div>`;
   mensajesEl.append(b);
   b.scrollIntoView({ block: "end" });
   return b;
@@ -264,6 +266,8 @@ formEl.addEventListener("submit", (e) => {
   void enviar(t);
 });
 
+document.getElementById("quien")!.textContent = NOMBRE[AGENTE] ?? AGENTE;
+document.querySelectorAll<HTMLAnchorElement>("a[data-agente]").forEach((a) => a.classList.toggle("activo", a.dataset.agente === AGENTE));
 (async () => {
   const partes: string[] = [];
   for (const [nombre, url] of Object.entries(SERVERS)) {

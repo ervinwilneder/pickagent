@@ -4,7 +4,7 @@
  */
 import { Agent } from "@mastra/core/agent";
 import { LibSQLStore } from "@mastra/libsql";
-import { MCPClient, MCPEventsSignalProvider } from "@mastra/mcp";
+import { MCPClient, MCPEventsSignalProvider, MCPServer } from "@mastra/mcp";
 import { Memory } from "@mastra/memory";
 import { instrucciones } from "./instrucciones.ts";
 
@@ -45,3 +45,14 @@ export const agente = new Agent({
 
 /** El hilo principal de la persona: es el que recibe los eventos. */
 export const hiloPrincipal = { resourceId: process.env.BELO_AGENTE_PERSONA ?? "ervin", threadId: "principal" };
+
+/** pickagent expuesto como MCP: cualquier host o agente le pregunta por la tool ask_pickagent. */
+export const pickagentMcp = new MCPServer({
+  id: "pickagent",
+  name: "pickagent",
+  version: "0.0.0",
+  description: "El agente de envíos de pickagent: le contás qué mandar y a dónde, y planifica, cotiza con los transportistas agregados y cobra por belo.",
+  legacy: "stateless",
+  tools: {},
+  agents: { pickagent: agente },
+});

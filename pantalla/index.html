@@ -9,7 +9,7 @@
 <body>
   <main class="pantalla">
     <header class="barra">
-      <span class="marca-belo">pickagent <span class="apagado">/ envíos con belo</span></span>
+      <span class="marca-belo">pickagent <span class="apagado">/ <span id="quien">pickagent</span></span></span>
       <span class="centro apagado" id="servidor">conectando con belo</span>
       <span class="estado" id="estado">iniciando</span>
     </header>
@@ -19,7 +19,7 @@
       <input id="texto" type="text" placeholder="escribile al agente" autocomplete="off">
       <button class="boton primario" id="enviar" type="submit">Enviar ↵</button>
     </form>
-    <footer class="pie"><span>motor://<b>logistica</b></span><span>paga://<b>belo</b></span><span>evento://<b>movimiento.nuevo</b></span><span>mcp://<b>apps + events</b></span></footer>
+    <footer class="pie"><span class="agentes"><a data-agente="pickagent" href="?agente=pickagent">pickagent</a> · <a data-agente="asistente" href="?agente=asistente">asistente con belo</a> · <a data-agente="asistente-sin-belo" href="?agente=asistente-sin-belo">asistente sin belo</a></span><span>motor://<b>logistica</b></span><span>paga://<b>belo</b></span><span>evento://<b>movimiento.nuevo</b></span><span>mcp://<b>apps + events</b></span></footer>
   </main>
   <script type="module" src="/src/main.ts"></script>
 </body>

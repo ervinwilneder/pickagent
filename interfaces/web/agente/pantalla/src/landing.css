@@ -25,7 +25,7 @@ h3 { font-size: 21px; line-height: 1.35; letter-spacing: -.02em; }
 /* La conversación explica el producto con los mismos importes del ejemplo original. */
 .hero { display: grid; grid-template-columns: minmax(0, 1.06fr) minmax(0, 1fr); gap: 64px; align-items: center; padding-block: 72px 96px; }
 h2 > span { display: inline-block; }
-html.con-revelado :is(h1 > span, .hero .bajada, .hero .acciones, .hero .muestra, h2:not(:has(> span)), h2 > span, .seccion h3, .seccion p, .seccion dt, .seccion dd, .seccion .numero, .seccion .ilustracion-seccion, .cierre > .boton, .pie-landing .marca, .pie-landing .pie-leyenda, .pie-landing .pie-etiqueta, .pie-landing .enlace-texto) { opacity: 0; }
+html.con-revelado :is(h1 > span, .hero .bajada, .hero .acciones, .hero .muestra, h2:not(:has(> span)), h2 > span, .seccion h3, .seccion p, .seccion dt, .seccion dd, .seccion .numero, .seccion .ilustracion-seccion, .cierre > .boton, .pie-landing .marca, .pie-landing .pie-etiqueta) { opacity: 0; }
 .hero .texto { display: grid; gap: 28px; }
 .bajada { max-width: 45ch; font-size: 20px; line-height: 1.75; color: var(--tenue); }
 .muestra { min-width: 0; background: var(--vidrio); border: 1px solid var(--linea); border-radius: 16px; box-shadow: var(--sombra-vidrio); backdrop-filter: blur(20px); overflow: hidden; }
@@ -76,10 +76,8 @@ html.con-revelado :is(h1 > span, .hero .bajada, .hero .acciones, .hero .muestra,
 .cierre p { max-width: 54ch; color: var(--tenue); }
 .cierre .boton { margin-top: 4px; }
 .pie-landing { display: grid; gap: 44px; padding-block: 40px 56px; border-top: 1px solid var(--linea); border-image: var(--divisor-horizontal) 1; }
-.pie-fila { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px 48px; }
+.pie-fila { display: flex; align-items: center; }
 .pie-landing .marca { font-size: 24px; }
-.pie-leyenda { justify-self: center; color: var(--tenue); font-size: 13.2px; text-align: center; }
-.pie-landing .enlace-texto { justify-self: end; color: var(--tenue); font-size: 13.2px; }
 .pie-grupos { display: grid; grid-template-columns: auto auto auto; justify-content: space-between; align-items: start; gap: 32px 48px; }
 .pie-grupo { display: grid; justify-items: start; gap: 14px; }
 .pie-etiqueta { margin: 0; color: var(--tenue); font-size: 14px; }
@@ -138,9 +136,7 @@ html.con-revelado :is(h1 > span, .hero .bajada, .hero .acciones, .hero .muestra,
   .numero { grid-row: 1 / 3; margin: 0; font-size: 24px; }
   .pasos h3, .pasos p { grid-column: 2; }
   .cierre { padding-block: 64px; }
-  .pie-fila, .pie-grupos { grid-template-columns: 1fr; justify-content: start; gap: 28px; }
-  .pie-fila { align-items: start; }
-  .pie-leyenda, .pie-landing .enlace-texto { justify-self: start; text-align: left; }
+  .pie-grupos { grid-template-columns: 1fr; justify-content: start; gap: 28px; }
   .pie-landing .enlace-texto { min-height: 29px; }
 }
 @media (max-width: 380px) {

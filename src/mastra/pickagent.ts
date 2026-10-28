@@ -11,10 +11,14 @@ import { MCPClient, MCPEventsSignalProvider, MCPServer } from "@mastra/mcp";
 import { Memory } from "@mastra/memory";
 import { instrucciones } from "./instrucciones.ts";
 
-/** Los dos servers MCP de pickagent. Sin defaults de producción: salen de la configuración. */
-const servidorBelo = process.env.BELO_MCP_URL;
+/**
+ * Los dos servers MCP de pickagent. El de belo es la cuenta de la empresa
+ * (PICKAGENT_BELO_MCP_URL); la del cliente la usa su asistente (BELO_MCP_URL).
+ * Sin defaults de producción: salen de la configuración.
+ */
+const servidorBelo = process.env.PICKAGENT_BELO_MCP_URL;
 const servidorLogistica = process.env.LOGISTICA_MCP_URL;
-if (!servidorBelo) throw new Error("Configurá BELO_MCP_URL (por ejemplo http://localhost:3001/mcp)");
+if (!servidorBelo) throw new Error("Configurá PICKAGENT_BELO_MCP_URL (la cuenta de belo de pickagent, por ejemplo http://localhost:3004/mcp)");
 if (!servidorLogistica) throw new Error("Configurá LOGISTICA_MCP_URL (por ejemplo http://localhost:3002/mcp)");
 
 export const storage = new LibSQLStore({ id: "belo-agente", url: process.env.BELO_AGENTE_DB ?? "file:./belo-agente.db" });

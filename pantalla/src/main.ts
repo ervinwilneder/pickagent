@@ -9,15 +9,21 @@ import { conectarServidor, renderizarVista, resolver as ubicar, type Servidores 
 import "./estilos.css";
 
 const MASTRA = import.meta.env.VITE_MASTRA_URL ?? "http://localhost:4111";
-/** Los servers MCP que el agente usa, por nombre: sus vistas se renderizan en el chat. */
-const SERVERS: Record<string, string> = {
-  logistica: import.meta.env.VITE_LOGISTICA_MCP_URL ?? "http://localhost:3002/mcp",
-  belo: import.meta.env.VITE_BELO_MCP_URL ?? "http://localhost:3001/mcp",
-};
 /** ?agente=asistente abre el asistente personal (con belo); ?agente=asistente-sin-belo, el mismo sin belo. */
 const AGENTE = new URLSearchParams(location.search).get("agente") ?? import.meta.env.VITE_AGENTE ?? "pickagent";
+/**
+ * Los servers MCP que el agente usa, por nombre: sus vistas se renderizan en
+ * el chat. La cuenta de belo depende de quién habla: pickagent usa la de la
+ * empresa; el asistente, la del cliente.
+ */
+const SERVERS: Record<string, string> = {
+  logistica: import.meta.env.VITE_LOGISTICA_MCP_URL ?? "http://localhost:3002/mcp",
+  belo: AGENTE === "pickagent" ? (import.meta.env.VITE_PICKAGENT_BELO_MCP_URL ?? "http://localhost:3004/mcp") : (import.meta.env.VITE_BELO_MCP_URL ?? "http://localhost:3001/mcp"),
+};
 const HILO = { threadId: AGENTE === "pickagent" ? "principal" : AGENTE, resourceId: import.meta.env.VITE_PERSONA ?? "ervin" };
-const NOMBRE: Record<string, string> = { pickagent: "pickagent", asistente: "mi asistente · con belo", "asistente-sin-belo": "mi asistente · sin belo" };
+const NOMBRE: Record<string, string> = { pickagent: "pickagent", asistente: "mi asistente", "asistente-sin-belo": "mi asistente" };
+const ES_ASISTENTE = AGENTE !== "pickagent";
+const CON_BELO = AGENTE !== "asistente-sin-belo";
 
 const mensajesEl = document.getElementById("mensajes")!;
 const estadoEl = document.getElementById("estado")!;
@@ -266,8 +272,23 @@ formEl.addEventListener("submit", (e) => {
   void enviar(t);
 });
 
+/* El switch de agente y el interruptor de belo cambian la URL y recargan: cada agente tiene su hilo. */
 document.getElementById("quien")!.textContent = NOMBRE[AGENTE] ?? AGENTE;
-document.querySelectorAll<HTMLAnchorElement>("a[data-agente]").forEach((a) => a.classList.toggle("activo", a.dataset.agente === AGENTE));
+const ir = (agente: string) => {
+  const u = new URL(location.href);
+  u.searchParams.set("agente", agente);
+  location.href = u.href;
+};
+document.querySelectorAll<HTMLButtonElement>("button[data-agente]").forEach((b) => {
+  b.classList.toggle("activo", (b.dataset.agente === "asistente") === ES_ASISTENTE);
+  b.addEventListener("click", () => ir(b.dataset.agente === "asistente" ? (CON_BELO ? "asistente" : "asistente-sin-belo") : "pickagent"));
+});
+const beloSwitch = document.getElementById("belo-switch") as HTMLInputElement;
+const beloEtiqueta = document.getElementById("belo-etiqueta")!;
+beloSwitch.checked = CON_BELO;
+beloEtiqueta.textContent = CON_BELO ? "belo conectado" : "belo desconectado";
+(beloSwitch.closest(".interruptor") as HTMLElement).hidden = !ES_ASISTENTE;
+beloSwitch.addEventListener("change", () => ir(beloSwitch.checked ? "asistente" : "asistente-sin-belo"));
 (async () => {
   const partes: string[] = [];
   for (const [nombre, url] of Object.entries(SERVERS)) {

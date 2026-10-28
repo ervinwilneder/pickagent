@@ -50,5 +50,17 @@ body { background: var(--negro); color: var(--papel); font-family: var(--mono); 
 .pie b { color: var(--verde); font-weight: 400; }
 @media (max-width: 600px) { .barra { grid-template-columns: auto auto; } .centro { display: none; } }
 
-.pie .agentes a { color: var(--apagado); text-decoration: none; }
-.pie .agentes a.activo { color: var(--verde); }
+/* Switch de agente e interruptor de belo */
+.controles { display: flex; align-items: center; justify-content: center; gap: 14px; text-transform: none; letter-spacing: 0; }
+.switch { display: inline-flex; border: 1px solid var(--linea); border-radius: 2px; overflow: hidden; }
+.switch button { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 5px 10px; border: 0; background: transparent; color: var(--apagado); cursor: pointer; }
+.switch button.activo { background: var(--verde); color: var(--negro); font-weight: 700; }
+.interruptor { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--apagado); cursor: pointer; }
+.interruptor input { position: absolute; opacity: 0; width: 0; height: 0; }
+.interruptor .pista { width: 30px; height: 16px; border-radius: 10px; border: 1px solid var(--linea); background: var(--negro); position: relative; transition: background .15s, border-color .15s; }
+.interruptor .perilla { position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--apagado); transition: left .15s, background .15s; }
+.interruptor input:checked + .pista { background: var(--verde-tenue, rgba(185,255,24,.12)); border-color: var(--verde); }
+.interruptor input:checked + .pista .perilla { left: 16px; background: var(--verde); }
+.interruptor input:checked ~ span:last-child { color: var(--verde); }
+.interruptor input:focus-visible + .pista { outline: 2px solid var(--verde); outline-offset: 2px; }
+@media (max-width: 700px) { .barra { grid-template-columns: 1fr; gap: 8px; } .barra > .estado { display: none; } }

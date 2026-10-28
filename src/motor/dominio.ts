@@ -1,64 +1,52 @@
-/** El dominio de la logística, en los términos del rubro. */
+/**
+ * El dominio de la logística, en los términos del rubro.
+ *
+ * Un envío nace como un Pedido (qué, de dónde, a dónde, para cuándo), recibe
+ * Ofertas de los Transportistas (precio, retiro y entrega estimados), una se
+ * convierte en Reserva, y la Reserva avanza por Hitos hasta la entrega.
+ */
 
-export type Vehiculo = "moto" | "utilitario" | "camion_chico" | "camion";
-export type Aptitud = "fragil" | "refrigerado";
-export type EstadoReserva = "reservada" | "pagada" | "en_curso" | "entregada" | "cancelada";
+export type Vehiculo = "moto" | "utilitario" | "camion_chico" | "camion" | "red_sucursales";
+export type Cuidado = "fragil" | "refrigerado" | "peligroso";
+export type EstadoReserva = "reservada" | "pagada" | "retirada" | "en_viaje" | "entregada" | "cancelada" | "con_problemas";
 
 export interface Localidad {
   nombre: string;
   provincia: string;
   zona: "AMBA" | "interior";
+  codigoPostal: string;
   lat: number;
   lon: number;
 }
 
-export interface Proveedor {
-  id: string;
-  nombre: string;
-  /** Dónde cobra por belo: belotag (interno, sin comisión) o CVU/alias. */
-  cobro: { addressType: "BELOTAG" | "CVU" | "ALIAS"; address: string };
-  /** Descuento que ofrece a quien paga por belo, como fracción (0.08 = 8 %). */
-  descuentoBelo: number;
-  calificacion: number;
-}
-
-export interface Servicio {
-  id: string;
-  proveedorId: string;
-  nombre: string;
-  vehiculo: Vehiculo;
-  /** Localidades o zonas ("AMBA", "interior", "*") que cubre como origen y como destino. */
-  cobertura: { origenes: string[]; destinos: string[] };
-  tarifa: { base: number; porKm: number; porKg: number };
-  capacidad: { kg: number; m3: number };
-  /** Ventana horaria de retiro, en hora local. */
-  ventana: { desde: number; hasta: number };
-  anticipacionHoras: number;
-  aptitudes: Aptitud[];
-  velocidadKmh: number;
+/** Un punto del envío: la localidad resuelta más lo que la persona escribió. */
+export interface Punto {
+  texto: string;
+  localidad: Localidad;
+  direccion?: string;
 }
 
 export interface Pedido {
   id: string;
-  origen: string;
-  destino: string;
+  origen: Punto;
+  destino: Punto;
   /** Hora límite de entrega, ISO 8601. */
   fechaLimite: string;
   mercaderia: string;
   pesoKg: number;
   volumenM3: number;
-  fragil: boolean;
-  refrigerado: boolean;
+  cuidados: Cuidado[];
+  /** Valor declarado, para seguro, opcional. */
+  valorDeclarado?: number;
   contacto: string;
   notas?: string;
   creado: string;
 }
 
-export interface Oferta {
-  id: string;
-  pedidoId: string;
-  servicioId: string;
-  proveedor: { id: string; nombre: string; calificacion: number };
+/** Lo que un transportista responde a un pedido, antes de ser una oferta del motor. */
+export interface Cotizacion {
+  /** Referencia del transportista para esta cotización (su id de tarifa, contrato o quote). */
+  referencia: string;
   servicio: string;
   vehiculo: Vehiculo;
   distanciaKm: number;
@@ -67,8 +55,23 @@ export interface Oferta {
   entrega: string;
   moneda: "ARS";
   precio: number;
+  /** Algo que la persona debe saber: punto de retiro, franja, seguro incluido. */
+  condiciones?: string[];
+}
+
+export interface Oferta extends Cotizacion {
+  id: string;
+  pedidoId: string;
+  transportista: { id: string; nombre: string; calificacion: number; modo: "catalogo" | "conectado" };
   descuentoBelo: number;
   precioBelo: number;
+}
+
+export interface Hito {
+  cuando: string;
+  estado: EstadoReserva;
+  donde?: string;
+  detalle: string;
 }
 
 export interface Reserva {
@@ -77,10 +80,15 @@ export interface Reserva {
   estado: EstadoReserva;
   pedido: Pedido;
   oferta: Oferta;
-  cobro: { monto: number; moneda: "ARS"; destinatario: Proveedor["cobro"] & { nombre: string } };
+  /** Referencia de la reserva en el transportista (su número de envío u orden). */
+  referencia: string;
+  etiquetaUrl?: string;
+  cobro: { monto: number; moneda: "ARS"; destinatario: { nombre: string; addressType: "BELOTAG" | "CVU" | "ALIAS"; address: string } };
   pago?: { transaccionId: string; monto: string; cuando: string };
+  hitos: Hito[];
   creada: string;
   actualizada: string;
 }
 
-export const vehiculoLegible: Record<Vehiculo, string> = { moto: "moto", utilitario: "utilitario", camion_chico: "camión chico", camion: "camión" };
+export const vehiculoLegible: Record<Vehiculo, string> = { moto: "moto", utilitario: "utilitario", camion_chico: "camión chico", camion: "camión", red_sucursales: "red de sucursales" };
+export const estadoLegible: Record<EstadoReserva, string> = { reservada: "reservada", pagada: "pagada", retirada: "retirada", en_viaje: "en viaje", entregada: "entregada", cancelada: "cancelada", con_problemas: "con problemas" };

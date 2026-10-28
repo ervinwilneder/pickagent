@@ -2,7 +2,7 @@
 import type { CallToolResult } from "@modelcontextprotocol/client";
 import { conectar, datos, esc, textoDeError } from "./comun.ts";
 
-interface Borrador { origen?: string; destino?: string; fechaLimite?: string; mercaderia?: string; pesoKg?: number; volumenM3?: number; fragil?: boolean; refrigerado?: boolean; contacto?: string; notas?: string }
+interface Borrador { origen?: string; destino?: string; direccionOrigen?: string; direccionDestino?: string; fechaLimite?: string; mercaderia?: string; pesoKg?: number; volumenM3?: number; cuidados?: string[]; valorDeclarado?: number; contacto?: string; notas?: string }
 
 const form = document.getElementById("form") as HTMLFormElement;
 const estadoEl = document.getElementById("estado")!;
@@ -30,12 +30,13 @@ function pintar(result: CallToolResult) {
   }
   const { borrador = {}, localidades = [] } = datos<{ borrador?: Borrador; localidades?: string[] }>(result);
   document.getElementById("localidades")!.innerHTML = localidades.map((l) => `<option value="${esc(l)}"></option>`).join("");
-  for (const k of ["origen", "destino", "mercaderia", "contacto", "notas"] as const) if (borrador[k]) campo(k).value = String(borrador[k]);
+  for (const k of ["origen", "destino", "direccionOrigen", "direccionDestino", "mercaderia", "contacto", "notas"] as const) if (borrador[k]) campo(k).value = String(borrador[k]);
+  if (borrador.valorDeclarado) campo("valorDeclarado").value = String(borrador.valorDeclarado);
   if (borrador.pesoKg) campo("pesoKg").value = String(borrador.pesoKg);
   if (borrador.volumenM3) campo("volumenM3").value = String(borrador.volumenM3);
   if (borrador.fechaLimite) campo("fechaLimite").value = aLocal(borrador.fechaLimite);
-  campo("fragil").checked = Boolean(borrador.fragil);
-  campo("refrigerado").checked = Boolean(borrador.refrigerado);
+  campo("fragil").checked = Boolean(borrador.cuidados?.includes("fragil"));
+  campo("refrigerado").checked = Boolean(borrador.cuidados?.includes("refrigerado"));
   const faltan = ["origen", "destino", "fechaLimite", "mercaderia", "pesoKg", "volumenM3", "contacto"].filter((k) => !campo(k).value);
   estadoEl.textContent = faltan.length ? `faltan ${faltan.length} datos` : "revisá y confirmá";
   (faltan[0] ? campo(faltan[0]) : boton).focus();
@@ -53,8 +54,10 @@ form.addEventListener("submit", async (e) => {
     mercaderia: campo("mercaderia").value,
     pesoKg: Number(campo("pesoKg").value),
     volumenM3: Number(campo("volumenM3").value),
-    fragil: campo("fragil").checked,
-    refrigerado: campo("refrigerado").checked,
+    direccionOrigen: campo("direccionOrigen").value || undefined,
+    direccionDestino: campo("direccionDestino").value || undefined,
+    cuidados: [campo("fragil").checked ? "fragil" : null, campo("refrigerado").checked ? "refrigerado" : null].filter(Boolean),
+    valorDeclarado: campo("valorDeclarado").value ? Number(campo("valorDeclarado").value) : undefined,
     contacto: campo("contacto").value,
     notas: campo("notas").value || undefined,
   };

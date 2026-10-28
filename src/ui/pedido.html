@@ -14,11 +14,14 @@
       <div class="campos">
         <div class="campo"><label for="origen">Retiro en</label><input id="origen" name="origen" list="localidades" required placeholder="Villa Crespo"></div>
         <div class="campo"><label for="destino">Entrega en</label><input id="destino" name="destino" list="localidades" required placeholder="Rosario"></div>
+        <div class="campo"><label for="direccionOrigen">Dirección de retiro</label><input id="direccionOrigen" name="direccionOrigen" placeholder="Calle y número (opcional)"></div>
+        <div class="campo"><label for="direccionDestino">Dirección de entrega</label><input id="direccionDestino" name="direccionDestino" placeholder="Calle y número (opcional)"></div>
         <div class="campo"><label for="fechaLimite">Entregar antes de</label><input id="fechaLimite" name="fechaLimite" type="datetime-local" required></div>
         <div class="campo"><label for="contacto">Contacto</label><input id="contacto" name="contacto" required placeholder="Nombre y teléfono"></div>
         <div class="campo ancho"><label for="mercaderia">Qué se manda</label><input id="mercaderia" name="mercaderia" required placeholder="20 cajas de repuestos"></div>
         <div class="campo"><label for="pesoKg">Peso total (kg)</label><input id="pesoKg" name="pesoKg" type="number" min="0.1" step="0.1" required placeholder="120"></div>
         <div class="campo"><label for="volumenM3">Volumen total (m³)</label><input id="volumenM3" name="volumenM3" type="number" min="0.001" step="0.01" required placeholder="1.2"></div>
+        <div class="campo"><label for="valorDeclarado">Valor declarado (ARS, opcional)</label><input id="valorDeclarado" name="valorDeclarado" type="number" min="0" step="1" placeholder="Para el seguro"></div>
         <div class="campo ancho marcas"><label><input type="checkbox" id="fragil" name="fragil"> frágil</label><label><input type="checkbox" id="refrigerado" name="refrigerado"> refrigerado</label></div>
         <div class="campo ancho"><label for="notas">Notas</label><input id="notas" name="notas" placeholder="Horario de carga, acceso, lo que haga falta"></div>
       </div>

@@ -1,0 +1,31 @@
+<section id="always-on" data-transition="fade" style="background:#f3f5f8;color:#10192b;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<h2 style="font-family:'Sora', Arial, sans-serif;font-size:72px;font-weight:700;letter-spacing:-2px;line-height:1.1">Un agente que no espera a que le hablen</h2>
+<p style="font-size:36px;color:#5c6677">An agent that doesn’t wait to be spoken to</p>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;background:#ffffff;border:1px solid #d8dee7;border-radius:20px;padding:40px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#5c6677;letter-spacing:2px;text-transform:uppercase">hosts por turnos · turn-based hosts</p>
+<h3 style="font-family:'Sora', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.15">Claude, ChatGPT</h3>
+<ul style="font-size:28px;line-height:1.45;color:#3a4556;padding:0 0 0 32px">
+<li>Responden solo a un mensaje de la persona</li>
+<li>Un evento es un mensaje más en el chat</li>
+<li>Si la pestaña está cerrada, nadie reacciona</li>
+</ul>
+<p style="font-size:24px;line-height:1.4;color:#5c6677"><i>They answer only a human message; an event is just another chat message; with the tab closed, nobody reacts.</i></p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;background:#10192b;color:#eef1f6;border-radius:20px;padding:40px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#f5b53a;letter-spacing:2px;text-transform:uppercase">always-on · pickagent</p>
+<h3 style="font-family:'Sora', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.15">Agentes sobre Mastra con señales</h3>
+<ul style="font-size:28px;line-height:1.45;color:#eef1f6;padding:0 0 0 32px">
+<li>Cada hilo está suscripto a los eventos de belo</li>
+<li>Un evento en un hilo inactivo arranca un turno</li>
+<li>La pantalla está suscripta al hilo: el turno se ve escribiéndose en vivo, herramientas incluidas</li>
+<li>Memoria por hilo, un hilo por agente y por modo (con belo, sin belo)</li>
+</ul>
+<p style="font-size:24px;line-height:1.4;color:#9aa5b6"><i>Every thread subscribes to belo’s events; an event on an idle thread starts a turn; the screen subscribes to the thread and shows the turn being written live, tool calls included.</i></p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#5c6677">pickagent · Buildathon 001 de belo</p>
+<aside>Los mismos MCP sirven en cualquier host. La diferencia está en quién corre el agente: en Claude lo corre la persona cuando escribe; en pickagent corre siempre. / The same MCP servers work in any host. The difference is who runs the agent: in Claude, the person does when they type; in pickagent, it runs all the time.</aside>
+</section>

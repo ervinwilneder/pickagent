@@ -1,0 +1,49 @@
+<section id="eventos" data-transition="fade" style="background:#fbfcfd;color:#10192b;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<h2 style="font-family:'Sora', Arial, sans-serif;font-size:72px;font-weight:700;letter-spacing:-2px;line-height:1.1">Del depósito al seguimiento, sin un solo mensaje</h2>
+<p style="font-size:36px;color:#5c6677">From deposit to tracking code, without a single message</p>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="width:300px;display:flex;flex-direction:column;gap:10px;background:#ffffff;border:1px solid #d8dee7;border-radius:16px;padding:28px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#f2a420">1</p>
+<p style="font-size:26px;font-weight:600;line-height:1.3">Entra el pago en la cuenta de pickagent</p>
+<p style="font-size:24px;line-height:1.3;color:#5c6677"><i>Deposit lands</i></p>
+</div>
+<x-connector style="width:40px;color:#5c6677"></x-connector>
+<div style="width:300px;display:flex;flex-direction:column;gap:10px;background:#ffffff;border:1px solid #d8dee7;border-radius:16px;padding:28px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#f2a420">2</p>
+<p style="font-size:26px;font-weight:600;line-height:1.3">El MCP de belo emite movimiento.nuevo</p>
+<p style="font-size:24px;line-height:1.3;color:#5c6677"><i>belo MCP emits the event</i></p>
+</div>
+<x-connector style="width:40px;color:#5c6677"></x-connector>
+<div style="width:300px;display:flex;flex-direction:column;gap:10px;background:#ffffff;border:1px solid #d8dee7;border-radius:16px;padding:28px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#f2a420">3</p>
+<p style="font-size:26px;font-weight:600;line-height:1.3">Mastra lo entrega al hilo como señal</p>
+<p style="font-size:24px;line-height:1.3;color:#5c6677"><i>Delivered to the thread as a signal</i></p>
+</div>
+<x-connector style="width:40px;color:#5c6677"></x-connector>
+<div style="width:300px;display:flex;flex-direction:column;gap:10px;background:#10192b;color:#eef1f6;border-radius:16px;padding:28px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#f5b53a">4</p>
+<p style="font-size:26px;font-weight:600;line-height:1.3">El agente arranca un turno solo</p>
+<p style="font-size:24px;line-height:1.3;color:#9aa5b6"><i>The agent starts a turn on its own</i></p>
+</div>
+<x-connector style="width:40px;color:#5c6677"></x-connector>
+<div style="width:300px;display:flex;flex-direction:column;gap:10px;background:#fff3d6;border-radius:16px;padding:28px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#b36f00">5</p>
+<p style="font-size:26px;font-weight:600;line-height:1.3">Reserva pagada, seguimiento en pantalla</p>
+<p style="font-size:24px;line-height:1.3;color:#5c6677"><i>Booking paid, tracking on screen</i></p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#f3f5f8;border-radius:16px;padding:28px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#10192b">events/list · events/poll · events/subscribe</p>
+<p style="font-size:24px;line-height:1.4;color:#5c6677">Borrador SEP-3415, implementado en Mastra. Nuestro server de belo lo expone por sondeo, sin estado: corre igual en Vercel. <i>Draft SEP-3415 as implemented by Mastra; our belo server exposes it stateless, by polling, so it runs on serverless.</i></p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#f3f5f8;border-radius:16px;padding:28px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#10192b">evento = dato, no instrucción · event = data, not instruction</p>
+<p style="font-size:24px;line-height:1.4;color:#5c6677">El evento llega marcado como no confiable: el agente lo cruza con sus reservas y nunca ejecuta lo que el evento diga. <i>Events arrive flagged untrusted: the agent matches them against its bookings and never executes what an event says.</i></p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#5c6677">pickagent · Buildathon 001 de belo</p>
+<aside>Lo mismo pasa del lado del cliente: su asistente escucha los movimientos de su propia cuenta y avisa cuando sale el pago y cuando la reserva queda confirmada. / Same on the customer side: the assistant listens to its own account’s movements and reports when the payment leaves and when the booking is confirmed.</aside>
+</section>

@@ -1,0 +1,20 @@
+{
+  "v": 4,
+  "createdOnFiles": { "v": 1, "at": "2026-10-28T19:05:00Z" },
+  "lists": "css",
+  "title": "pickagent",
+  "order": ["cover", "que-es", "flujo", "s-proveedores", "proveedores", "mcp-logistica", "s-eventos", "eventos", "always-on", "s-belo-air", "belo-air", "beneficios", "demo", "cierre"],
+  "sections": {
+    "intro": { "description": "Qué es pickagent y cómo resuelve un envío de punta a punta.", "start": "cover" },
+    "proveedores": { "description": "Cómo se agregan los transportistas y qué expone el MCP de logística.", "start": "s-proveedores" },
+    "eventos": { "description": "MCP Events: el pago dispara al agente sin que nadie pregunte, y por qué eso exige un agente always-on.", "start": "s-eventos" },
+    "belo-air": { "description": "belo air y los beneficios de conectar belo: contra entrega sin efectivo, precio con belo, pago en un paso.", "start": "s-belo-air" },
+    "cierre": { "description": "Guion de la demo, stack y próximos pasos.", "start": "demo" }
+  },
+  "faces": {
+    "sora": { "family": "Sora", "href": "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" },
+    "ibm-plex-sans": { "family": "IBM Plex Sans", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" },
+    "ibm-plex-mono": { "family": "IBM Plex Mono", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" }
+  },
+  "designSystems": []
+}

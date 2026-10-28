@@ -1,0 +1,31 @@
+<section id="mcp-logistica" data-transition="fade" style="background:#f3f5f8;color:#10192b;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<h2 style="font-family:'Sora', Arial, sans-serif;font-size:72px;font-weight:700;letter-spacing:-2px;line-height:1.1">El motor es un MCP con vistas</h2>
+<p style="font-size:36px;color:#5c6677">The engine is an MCP server with its own UI</p>
+</div>
+<div style="display:flex;gap:40px;align-items:start">
+<table style="width:1000px;font-size:26px;color:#10192b;background:#ffffff;border:1px solid #d8dee7;padding:12px 18px">
+<tr style="background:#f3f5f8"><th style="width:34%;text-align:left;font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#5c6677">herramienta · tool</th><th style="width:66%;text-align:left;font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#5c6677">qué hace · what it does</th></tr>
+<tr><td>pedido_envio</td><td>Abre el formulario precargado · opens the prefilled form <b>(vista)</b></td></tr>
+<tr><td>ofertas</td><td>Cotiza a todos y muestra las ofertas · quotes everyone, shows offers <b>(vista)</b></td></tr>
+<tr><td>reservar</td><td>Reserva con modo de pago · books with a payment mode</td></tr>
+<tr><td>reservas_pendientes · marcar_pagada</td><td>Cruza depósitos con reservas · matches deposits to bookings</td></tr>
+<tr><td>seguimiento</td><td>Hitos del envío · shipment milestones</td></tr>
+<tr><td>transportistas · cargar_servicio</td><td>Alta de proveedores y servicios · provider onboarding</td></tr>
+</table>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#ffffff;border:1px solid #d8dee7;border-radius:20px;padding:32px">
+<h3 style="font-family:'Sora', Arial, sans-serif;font-size:34px;font-weight:600;line-height:1.15">Vistas por MCP Apps</h3>
+<p style="font-size:26px;line-height:1.4;color:#3a4556">Formulario y ofertas son HTML del server, en sandbox dentro del chat. La vista le habla al agente: “Confirmé el pedido”, “Elijo la oferta”.</p>
+<p style="font-size:24px;line-height:1.4;color:#5c6677"><i>Form and offers are server HTML, sandboxed inside the chat. The view talks back to the agent.</i></p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#ffffff;border:1px solid #d8dee7;border-radius:20px;padding:32px">
+<h3 style="font-family:'Sora', Arial, sans-serif;font-size:34px;font-weight:600;line-height:1.15">Un MCP, todos los hosts</h3>
+<p style="font-size:26px;line-height:1.4;color:#3a4556">Claude Desktop renderiza las vistas. ChatGPT usa las tools en texto. La pantalla de pickagent, todo en vivo.</p>
+<p style="font-size:24px;line-height:1.4;color:#5c6677"><i>Claude Desktop renders the views; ChatGPT uses the tools as text; pickagent’s own screen shows it all live.</i></p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:24px;color:#5c6677">pickagent · Buildathon 001 de belo</p>
+<aside>El motor es hexagonal: dominio, puerto Transportista, adaptadores por catálogo y conectados, registro. El MCP es su interfaz para agentes; las vistas viajan como recursos ui:// versionados. / Hexagonal engine: domain, Carrier port, catalog and connected adapters, registry. The MCP is its agent-facing interface; views travel as versioned ui:// resources.</aside>
+</section>

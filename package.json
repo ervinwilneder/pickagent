@@ -9,11 +9,12 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build:ui": "for f in src/ui/*.html; do cross-env INPUT=$f vite build || exit 1; done",
-    "build": "npm run typecheck && npm run build:ui",
+    "build": "npm run typecheck && npm run build:ui && npm run build:api",
     "serve": "tsx main.ts",
     "dev": "cross-env NODE_ENV=development concurrently \"npm run build:ui -- --watch\" \"tsx --watch main.ts\"",
     "belo:types": "openapi-typescript ../../.development/research/api/belo-baas-openapi.json -o src/belo/openapi.d.ts",
-    "escucha": "tsx escucha.ts"
+    "escucha": "tsx escucha.ts",
+    "build:api": "esbuild src/vercel.ts --bundle --packages=external --platform=node --format=esm --outfile=api/mcp.js"
   },
   "dependencies": {
     "@mastra/core": "^1.79.0",
@@ -27,6 +28,7 @@
     "@types/node": "^26.6.5",
     "concurrently": "^10.0.6",
     "cross-env": "^10.1.0",
+    "esbuild": "^0.28.2",
     "openapi-typescript": "^7.13.0",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
